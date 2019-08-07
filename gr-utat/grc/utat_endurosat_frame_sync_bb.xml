@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- This XML file was written by Ryan Song
+       * File acts as the interface between backend and gnuradio companion
+       * There are no parameters for this block. One sink and one source -->
+
+<block>
+  <name>Endurosat Frame Sync</name>
+  <key>utat_endurosat_frame_sync_bb</key>
+  <category>Utat</category>
+  <import>import utat</import>
+  <make>utat.endurosat_frame_sync_bb()</make>
+
+  <sink>
+    <name>in</name>
+    <type>byte</type>
+  </sink>
+
+  <source>
+    <name>out</name>
+    <type>byte</type>
+  </source>
+</block>
