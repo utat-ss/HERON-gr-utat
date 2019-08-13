@@ -63,9 +63,12 @@ namespace gr {
     void
     endurosat_frame_sync_bb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
+        // This parameter tells the scheduler the preferred length of buffer
         unsigned ninputs = ninput_items_required.size ();
-        for(unsigned i = 0; i < ninputs; i++)
-            ninput_items_required[i] = noutput_items;
+        for(unsigned i = 0; i < ninputs; i++){
+            ninput_items_required[i] = noutput_items*REQUESTED_BUFFER_RATIO;
+            //ninput_items_required[i] = REQUESTED_BUFFER_LENGTH;
+        }
     }
 
     int
@@ -77,7 +80,7 @@ namespace gr {
         /* Input and output streams and their length */
         const uint8_t *in = (const uint8_t *) input_items[0];
         uint8_t *out = (uint8_t *) output_items[0];
-        const int ninput = noutput_items;
+        const int ninput = noutput_items*REQUESTED_BUFFER_RATIO;
 
         /* Shift registers, data vector, and stream iterator */
         uint32_t training_field = 0x00000000;
@@ -85,10 +88,7 @@ namespace gr {
         std::vector<std::vector<uint8_t> > data;
         uint32_t stream_it = 0;
 
-        for(int i=0; i<ninput; i++){
-            /* Just send down the out stream what comes in. */
-            out[i] = in[i];
-        }  
+        std::cout << ninput << '\n';
 
         /* Iterate over input stream */
         while(stream_it < ninput){    
@@ -100,6 +100,8 @@ namespace gr {
                 training_field = training_field << 1;
 
             stream_it++;
+
+            // std::cout << training_field << '\n';
 
             /* If the training field exists, then continue to iterate down the stream until the data flag */
             if(training_field == 0x55555555) {
@@ -220,11 +222,17 @@ namespace gr {
             std::cout << '\n';
         }
 
+        for(int i=0; i<ninput; i++){
+            /* Just send down the out stream what comes in. */
+            if(i == REQUESTED_BUFFER_RATIO/2)
+                out[0] = in[i];
+        }  
+
         /* Tell runtime system how many input items we consumed on input stream. */
         consume_each (ninput);
 
         /* Tell runtime system how many output items we produced. */
-        return ninput;
+        return noutput_items;
     }
 
     /* bad_crc16-ccitt value is calculated on the data length and the data field concatenated into one string of bytes */

@@ -31,6 +31,7 @@
 #include <vector>
 
 #define   MAX_DATA_LENGTH   256
+#define   REQUESTED_BUFFER_RATIO 3000
 
 namespace gr {
   namespace utat {

@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/utat/api.h
+gnuradio/attributes.h
+-
+
+../include/utat/endurosat_frame_sync_bb.h
+utat/api.h
+-
+gnuradio/block.h
+-
+
+/home/ryan/Dev/comms/gr-utat/lib/endurosat_frame_sync_bb_impl.cc
+config.h
+/home/ryan/Dev/comms/gr-utat/lib/config.h
+gnuradio/io_signature.h
+-
+endurosat_frame_sync_bb_impl.h
+/home/ryan/Dev/comms/gr-utat/lib/endurosat_frame_sync_bb_impl.h
+iostream
+-
+vector
+-
+
+/home/ryan/Dev/comms/gr-utat/lib/endurosat_frame_sync_bb_impl.h
+utat/endurosat_frame_sync_bb.h
+-
+iostream
+-
+vector
+-
+
