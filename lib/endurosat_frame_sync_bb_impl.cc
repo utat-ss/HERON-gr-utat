@@ -30,8 +30,6 @@
 
 #include <gnuradio/io_signature.h>
 #include "endurosat_frame_sync_bb_impl.h"
-#include <iostream>
-#include <vector>
 
 namespace gr {
   namespace utat {
@@ -51,188 +49,188 @@ namespace gr {
       : gr::block("endurosat_frame_sync_bb",
               gr::io_signature::make(1, 1, sizeof(uint8_t)),
               gr::io_signature::make(1, 1, sizeof(uint8_t)))
-    {}
+    {
+        packet_training_field = 0x00000000;
+        packet_data_flag = 0x00;
+        packet_data_length = 0x00;
+        packet_data_field.clear();
+        packet_crc_checksum = 0x0000;
+        state = training_field_state;
+        counter = 0; 
+    }
 
-    /*
-     * Our virtual destructor.
-     */
+    /* Our virtual destructor */
     endurosat_frame_sync_bb_impl::~endurosat_frame_sync_bb_impl()
     {
     }
 
+    /* lets the scheduler know the expected ratio of input to output items */
     void
     endurosat_frame_sync_bb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-        // This parameter tells the scheduler the preferred length of buffer
+        /* Sync block forecast. Number of input items is equal to the number of output items */
         unsigned ninputs = ninput_items_required.size ();
         for(unsigned i = 0; i < ninputs; i++){
-            ninput_items_required[i] = noutput_items*REQUESTED_BUFFER_RATIO;
-            //ninput_items_required[i] = REQUESTED_BUFFER_LENGTH;
+            ninput_items_required[i] = noutput_items;
         }
     }
 
+    /* function that will be called to do signal processing */
     int
     endurosat_frame_sync_bb_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-        /* Input and output streams and their length */
+        /* Cast the input and output streams */
         const uint8_t *in = (const uint8_t *) input_items[0];
         uint8_t *out = (uint8_t *) output_items[0];
-        const int ninput = noutput_items*REQUESTED_BUFFER_RATIO;
 
-        /* Shift registers, data vector, and stream iterator */
-        uint32_t training_field = 0x00000000;
-        uint8_t data_flag = 0x00;
-        std::vector<std::vector<uint8_t> > data;
-        uint32_t stream_it = 0;
+        /* Number of input items equal number of output items */
+        const int ninput = noutput_items;
 
-        std::cout << ninput << '\n';
-
-        /* Iterate over input stream */
-        while(stream_it < ninput){    
-
-            /* Parse stream and store values into training field */
-            if(in[stream_it] == 0x01) 
-                training_field = (training_field << 1) + 1;
-            else if(in[stream_it] == 0x00) 
-                training_field = training_field << 1;
-
-            stream_it++;
-
-            // std::cout << training_field << '\n';
-
-            /* If the training field exists, then continue to iterate down the stream until the data flag */
-            if(training_field == 0x55555555) {
-                std::cout << "Training field detected " << '\n';
-
-                /* Look for data flag (0x7E) within the next 32 bits */
-                bool data_flag_found = false;
-
-                for(int i=0; i<32; i++) {
-                    if(!(stream_it<ninput)) {
-                        std::cerr << " Reached end of buffer when searching for data flag " << '\n';
-                        break;
-                    }
-
-                    /* Parse stream and store values into data flag */
-                    if(in[stream_it] == 0x01) 
-                        data_flag = (data_flag << 1) + 1;
-                    else if(in[stream_it] == 0x00) 
-                        data_flag = data_flag << 1;
-
-                    stream_it++;
-
-                    /* If flag is found, process the packet */
-                    if(data_flag == 0x7E) {
-                        data_flag_found = true;
-                        std::cout << "Data flag detected " << '\n';
-                        
-                        uint8_t data_length = 0x00;
-                        uint16_t crc_check = 0x0000;
-                        std::vector<uint8_t> data_field;
-
-                        /* Move along the stream and check for data length */
-                        if(stream_it + 8 < ninput){
-                            for(int i=0; i<8; i++){
-                                if(in[stream_it+i] == 0x01)
-                                    data_length = (data_length << 1) + 1;
-                                else if(in[stream_it+i] == 0x00)
-                                    data_length = data_length << 1;
-                            }
-                            // Increment
-                            stream_it += 8;
-                        } else {
-                            std::cerr << " Reached end of buffer when reading data length " << '\n';
-                            break;
-                        }
-
-                        std::cout << "Data length: " << data_length << '\n';
-
-                        /* 
-                         * Use length of buffer to search for the data field
-                         * length of data in the stream is the length of the data muliplied by 8
-                         */
-                        if(stream_it + data_length*8 < ninput){
-                            /* Iterate over the bytes as well as the individual bits */
-                            for(int byte_num=0; byte_num<data_length; byte_num++){
-                                uint8_t data_byte=0x00;
-                                for(int bit_num=0; bit_num<8; bit_num++){
-                                    if(in[stream_it + 8*byte_num + bit_num] == 0x01){
-                                        data_byte = (data_byte << 1) + 1;
-                                    } else if (in[stream_it + 8*byte_num + bit_num] == 0x00) {
-                                        data_byte = data_byte << 1;
-                                    }
-                                }
-                                data_field.push_back(data_byte);
-                            }
-                            // Increment
-                            stream_it += data_length*8;
-                        } else {
-                            std::cerr << " Reached end of buffer when reading data " << '\n';
-                            break;
-                        }
-
-                        /* Move along the stream and check for crc16-citt checksum */
-                        if(stream_it + 16 < ninput){
-                            for(int i=0; i<16; i++){
-                                if(in[stream_it+i] == 0x01)
-                                    crc_check = (crc_check << 1) + 1;
-                                else if(in[stream_it+i] == 0x00)
-                                    crc_check = crc_check << 1;
-                            }
-                            // Increment
-                            stream_it += 16;
-                        } else {
-                            std::cerr << " Reached end of buffer when reading crc16 field " << '\n';
-                            break;
-                        }
-
-                        std::cout << "CRC field: " << crc_check << '\n';
-
-                        // Perform checkssum to see if packet is valid
-                        if( crc16(data_field, data_length) == crc_check ) {
-                            /* push data_field onto the main data vector to be returned */
-                            data.push_back(data_field);
-                        } else {
-                            std::cerr << " BAD CRC " << '\n';
-                        }
-
-                        break;
-                    }
- 
-                }   
-
-                if(!data_flag_found){
-                    std::cerr << " Did not find data flag " << '\n';
-                } 
-                /* Reset shift registers for the next potential packet */
-                training_field = 0x00000000;
-                data_flag = 0x00;
-            }
-        }
-
-        /* Send processed packet data to std::out */
-        for ( int packet_it=0; packet_it<data.size(); packet_it++ ){
-            std::cout << "Packet Data: ";
-            for( int byte_it=0; byte_it<data[packet_it].size(); byte_it++ ){
-                std::cout << data[packet_it][byte_it]; 
-            }
-            std::cout << '\n';
-        }
-
+        /* Iterate through this buffer */
         for(int i=0; i<ninput; i++){
-            /* Just send down the out stream what comes in. */
-            if(i == REQUESTED_BUFFER_RATIO/2)
-                out[0] = in[i];
-        }  
+            /* send this byte in for processing */
+            process_byte( in[i] );
+            /* send the exact same information down the stream without alteration */
+            out[i] = in[i];
+        }
 
         /* Tell runtime system how many input items we consumed on input stream. */
         consume_each (ninput);
 
         /* Tell runtime system how many output items we produced. */
         return noutput_items;
+    }
+
+    /* function that processes the byte */
+    void 
+    process_byte( uint8_t byte ) {
+        /* depending on the state, handle the byte differently */
+        switch (state) {
+            case training_field_state: 
+                /* read value of byte and push onto shift register */
+                if(byte == 0x01) 
+                    packet_training_field = (packet_training_field << 1) + 1;
+                else if(byte == 0x00) 
+                    packet_training_field = packet_training_field << 1;
+                
+                /* check if the training field has been reached, if so update the state */
+                if(packet_training_field == 0x55555555) {
+                    std::cout << "Training field detected" << '\n';
+                    state = data_flag_state;
+                }
+            break;
+
+            case data_flag_state:
+                /* use counter to keep track of position. Flag must be found withing 32 bits */
+                if(counter < 32) {
+                    /* read value of byte and push onto shift register */
+                    if(byte == 0x01) 
+                        packet_data_flag = (packet_data_flag << 1) + 1;
+                    else if(byte == 0x00) 
+                        packet_data_flag = packet_data_flag << 1;
+
+                    if(packet_data_flag == 0x7E) {
+                        std::cout << "Data flag detected" << '\n';
+                        counter = 0;
+                        state = data_length_state;
+                    }
+                    /* increment */
+                    counter++;
+                }
+                else {
+                    clear_all_packet_reg();
+                }
+            break;
+
+            case data_length_state:
+                /* read value of byte and push onto shift register for 8 positions */
+                if(counter < 8) {
+                    if(byte == 0x01) 
+                        packet_data_length = (packet_data_length << 1) + 1;
+                    else if(byte == 0x00) 
+                        packet_data_length = packet_data_length << 1;
+                    /* increment */
+                    counter++;
+                } 
+                else {
+                    std::cout << "Data length is: " << packet_data_length << '\n'; 
+                    counter = 0;
+                    state = data_field_state;
+                }
+            break;
+
+            case data_field_state:
+                /* 8*packet_data_length positions should be read */
+                if(counter < 8*packet_data_length) {
+                    /* if counter is a multiple of 8, it means there is a new byte */
+                    if((counter % 8) == 0) {
+                        packet_data_field.push_back(0x00);
+                    } 
+                    int byte_num = (int)(counter / 8);
+                    /* read value of new byte */
+                    if(byte == 0x01) 
+                        packet_data_field[byte_num] = (packet_data_field[byte_num] << 1) + 1;
+                    else if(byte == 0x00) 
+                        packet_data_field[byte_num] = packet_data_field[byte_num] << 1;
+                    /* increment */
+                    counter++;
+                }
+                else {
+                    std::cout << "Data field received " << '\n';
+                    counter = 0;
+                    state = crc_checksum_state;
+                }
+            break;
+
+            case crc_checksum_state:
+                /* read value of byte and push onto shift register for 8 positions */
+                if(counter < 16) {
+                    if(byte == 0x01) 
+                        packet_crc_checksum = (packet_crc_checksum << 1) + 1;
+                    else if(byte == 0x00) 
+                        packet_crc_checksum = packet_crc_checksum << 1;
+                    /* increment */
+                    counter++;
+                } 
+                else {
+                    std::cout << "CRC checksum is: " << packet_crc_checksum << '\n'; 
+                    counter = 0;
+                    state = validation_state;
+                }
+            break;
+
+            case validation_state:
+                /* perform a crc16 check */
+                if( crc16(packet_data_field, packet_data_length) == crc_check ) {
+                    for(int i=0; i<packet_data_field.size(); i++) {
+                        std::cout << packet_data_field[i];
+                    }
+                    std::cout << '\n';
+                } 
+                else {
+                    std::cerr << " BAD CRC " << '\n';
+                }
+                /* clear all registers for the next packet */
+                clear_all_packet_reg();
+            break;
+
+            default: clear_all_packet_reg(); break;
+        }
+    }
+
+    /* clears all packet registers */
+    void 
+    clear_all_packet_reg() {
+        packet_training_field = 0x00000000;
+        packet_data_flag = 0x00;
+        packet_data_length = 0x00;
+        packet_data_field.clear();
+        packet_crc_checksum = 0x0000;
+        state = training_field_state;
+        counter = 0; 
     }
 
     /* bad_crc16-ccitt value is calculated on the data length and the data field concatenated into one string of bytes */
