@@ -118,7 +118,7 @@ namespace gr {
                 
                 /* check if the training field has been reached, if so update the state */
                 if(packet_training_field == 0x55555555) {
-                    std::cout << "Training field detected" << '\n';
+                    // std::cout << "Training field detected" << '\n';
                     state = data_flag_state;
                 }
             break;
@@ -136,7 +136,7 @@ namespace gr {
                     counter++;
 
                     if(packet_data_flag == 0x7E) {
-                        std::cout << "Data flag detected" << '\n';
+                        // std::cout << "Data flag detected" << '\n';
                         counter = 0;
                         state = data_length_state;
                     }
@@ -155,12 +155,13 @@ namespace gr {
                         packet_data_length = packet_data_length << 1;
                     /* increment */
                     counter++;
+
+                    if(counter == 8) {
+                        // std::cout << "Data length is: " << (int) packet_data_length << '\n'; 
+                        counter = 0;
+                        state = data_field_state;
+                    }
                 } 
-                else {
-                    std::cout << "Data length is: " << (int) packet_data_length << '\n'; 
-                    counter = 0;
-                    state = data_field_state;
-                }
             break;
 
             case data_field_state:
@@ -178,11 +179,12 @@ namespace gr {
                         packet_data_field[byte_num] = packet_data_field[byte_num] << 1;
                     /* increment */
                     counter++;
-                }
-                else {
-                    std::cout << "Data field received " << '\n';
-                    counter = 0;
-                    state = crc_checksum_state;
+
+                    if(counter == 8*packet_data_length){
+                        // std::cout << "Data field received " << '\n';
+                        counter = 0;
+                        state = crc_checksum_state;
+                    }
                 }
             break;
 
@@ -195,24 +197,26 @@ namespace gr {
                         packet_crc_checksum = packet_crc_checksum << 1;
                     /* increment */
                     counter++;
+
+                    if(counter == 16){
+                        // std::cout << "CRC checksum is: " << packet_crc_checksum << '\n'; 
+                        counter = 0;
+                        state = validation_state;
+                    }
                 } 
-                else {
-                    std::cout << "CRC checksum is: " << packet_crc_checksum << '\n'; 
-                    counter = 0;
-                    state = validation_state;
-                }
             break;
 
             case validation_state:
                 /* debugging */
-                // std::cout << "Packet CRC checksum: "  << packet_crc_checksum << '\n';
                 // std::cout << "Actual CRC: " << crc16(packet_data_field, packet_data_length) << '\n';
-                // for(int i=0; i<packet_data_field.size(); i++) {
-                //     std::cout << packet_data_field[i];
+                // for(int i=0; i<packet_data_field.size() - 1; i++) {
+                //     std::bitset<8> x(packet_data_field[i]);
+                //     std::cout << x << '\n';
                 // }
                 // std::cout << '\n';
                 /* perform a crc16 check */
                 if( crc16(packet_data_field, packet_data_length) == packet_crc_checksum ) {
+                    std::cout << "Packet received: ";
                     for(int i=0; i<packet_data_field.size(); i++) {
                         std::cout << packet_data_field[i];
                     }
