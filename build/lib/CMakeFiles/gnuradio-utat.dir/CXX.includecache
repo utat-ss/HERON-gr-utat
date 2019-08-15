@@ -23,10 +23,6 @@ gnuradio/io_signature.h
 -
 endurosat_frame_sync_bb_impl.h
 /home/ryan/Dev/comms/gr-utat/lib/endurosat_frame_sync_bb_impl.h
-iostream
--
-vector
--
 
 /home/ryan/Dev/comms/gr-utat/lib/endurosat_frame_sync_bb_impl.h
 utat/endurosat_frame_sync_bb.h

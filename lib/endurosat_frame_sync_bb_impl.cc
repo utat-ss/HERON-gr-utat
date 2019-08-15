@@ -106,7 +106,7 @@ namespace gr {
 
     /* function that processes the byte */
     void 
-    process_byte( uint8_t byte ) {
+    endurosat_frame_sync_bb_impl::process_byte( uint8_t byte ) {
         /* depending on the state, handle the byte differently */
         switch (state) {
             case training_field_state: 
@@ -124,7 +124,7 @@ namespace gr {
             break;
 
             case data_flag_state:
-                /* use counter to keep track of position. Flag must be found withing 32 bits */
+                /* use counter to keep track of position. Flag must be found withing 16 bits */
                 if(counter < 32) {
                     /* read value of byte and push onto shift register */
                     if(byte == 0x01) 
@@ -132,13 +132,14 @@ namespace gr {
                     else if(byte == 0x00) 
                         packet_data_flag = packet_data_flag << 1;
 
+                    /* increment */
+                    counter++;
+
                     if(packet_data_flag == 0x7E) {
                         std::cout << "Data flag detected" << '\n';
                         counter = 0;
                         state = data_length_state;
                     }
-                    /* increment */
-                    counter++;
                 }
                 else {
                     clear_all_packet_reg();
@@ -156,7 +157,7 @@ namespace gr {
                     counter++;
                 } 
                 else {
-                    std::cout << "Data length is: " << packet_data_length << '\n'; 
+                    std::cout << "Data length is: " << (int) packet_data_length << '\n'; 
                     counter = 0;
                     state = data_field_state;
                 }
@@ -203,8 +204,15 @@ namespace gr {
             break;
 
             case validation_state:
+                /* debugging */
+                // std::cout << "Packet CRC checksum: "  << packet_crc_checksum << '\n';
+                // std::cout << "Actual CRC: " << crc16(packet_data_field, packet_data_length) << '\n';
+                // for(int i=0; i<packet_data_field.size(); i++) {
+                //     std::cout << packet_data_field[i];
+                // }
+                // std::cout << '\n';
                 /* perform a crc16 check */
-                if( crc16(packet_data_field, packet_data_length) == crc_check ) {
+                if( crc16(packet_data_field, packet_data_length) == packet_crc_checksum ) {
                     for(int i=0; i<packet_data_field.size(); i++) {
                         std::cout << packet_data_field[i];
                     }
@@ -223,7 +231,7 @@ namespace gr {
 
     /* clears all packet registers */
     void 
-    clear_all_packet_reg() {
+    endurosat_frame_sync_bb_impl::clear_all_packet_reg() {
         packet_training_field = 0x00000000;
         packet_data_flag = 0x00;
         packet_data_length = 0x00;
