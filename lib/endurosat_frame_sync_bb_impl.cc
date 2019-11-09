@@ -30,6 +30,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "endurosat_frame_sync_bb_impl.h"
+#include <iomanip>
 
 namespace gr {
   namespace utat {
@@ -94,11 +95,14 @@ namespace gr {
             /* send this byte in for processing */
             process_byte( in[i] );
             /* send the exact same information down the stream without alteration */
+            // XXX Consider modifying the actual byte output here - send 0x1D for non-packets
             out[i] = in[i];
         }
 
         /* Tell runtime system how many input items we consumed on input stream. */
         consume_each (ninput);
+
+        // XXX Alternatively, update the output here, not in the loop
 
         /* Tell runtime system how many output items we produced. */
         return noutput_items;
@@ -121,7 +125,8 @@ namespace gr {
                     // std::cout << "Training field detected" << '\n';
                     state = data_flag_state;
                 }
-            break;
+                
+                break;
 
             case data_flag_state:
                 /* use counter to keep track of position. Flag must be found withing 16 bits */
@@ -144,7 +149,8 @@ namespace gr {
                 else {
                     clear_all_packet_reg();
                 }
-            break;
+                
+                break;
 
             case data_length_state:
                 /* read value of byte and push onto shift register for 8 positions */
@@ -162,7 +168,8 @@ namespace gr {
                         state = data_field_state;
                     }
                 } 
-            break;
+            
+                break;
 
             case data_field_state:
                 /* 8*packet_data_length positions should be read */
@@ -186,7 +193,8 @@ namespace gr {
                         state = crc_checksum_state;
                     }
                 }
-            break;
+                
+                break;
 
             case crc_checksum_state:
                 /* read value of byte and push onto shift register for 8 positions */
@@ -198,38 +206,35 @@ namespace gr {
                     /* increment */
                     counter++;
 
-                    if(counter == 16){
+                    if (counter == 16){
                         // std::cout << "CRC checksum is: " << packet_crc_checksum << '\n'; 
+                        if( crc16(packet_data_field, packet_data_length) == packet_crc_checksum ) {
+                            std::cout << "==========================" << std::endl;
+                            std::cout << "Packet received: " << std::endl;
+                            std::cout << "Size: " << packet_data_field.size() << std::endl;
+                            for(int i=0; i<packet_data_field.size(); i++) {
+                                std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << int(packet_data_field[i]) << " ";
+                            }
+                            std::cout << std::endl;
+                        } 
+                        else {
+                            std::cerr << "PACKET PROCESSED: BAD CRC" << std::endl;
+                        }
+
+                        // Clean up
+                        clear_all_packet_reg();
                         counter = 0;
-                        state = validation_state;
+                        state = training_field_state;
                     }
                 } 
-            break;
+                
+                break;
 
-            case validation_state:
-                /* debugging */
-                // std::cout << "Actual CRC: " << crc16(packet_data_field, packet_data_length) << '\n';
-                // for(int i=0; i<packet_data_field.size() - 1; i++) {
-                //     std::bitset<8> x(packet_data_field[i]);
-                //     std::cout << x << '\n';
-                // }
-                // std::cout << '\n';
-                /* perform a crc16 check */
-                if( crc16(packet_data_field, packet_data_length) == packet_crc_checksum ) {
-                    std::cout << "Packet received: ";
-                    for(int i=0; i<packet_data_field.size(); i++) {
-                        std::cout << packet_data_field[i];
-                    }
-                    std::cout << '\n';
-                } 
-                else {
-                    std::cerr << " BAD CRC " << '\n';
-                }
-                /* clear all registers for the next packet */
-                clear_all_packet_reg();
-            break;
+            default: 
+                clear_all_packet_reg(); 
+                state = training_field_state;
+                break;
 
-            default: clear_all_packet_reg(); break;
         }
     }
 
