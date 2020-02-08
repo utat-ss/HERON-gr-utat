@@ -90,13 +90,20 @@ namespace gr {
         /* Number of input items equal number of output items */
         const int ninput = noutput_items;
 
+        std::vector<uint8_t> processed;
         /* Iterate through this buffer */
         for(int i=0; i<ninput; i++){
             /* send this byte in for processing */
-            process_byte( in[i] );
+            processed = process_byte( in[i] );
             /* send the exact same information down the stream without alteration */
             // XXX Consider modifying the actual byte output here - send 0x1D for non-packets
-            out[i] = in[i];
+            if (processed.empty()) {
+                out[i] = 0;
+            } else {
+                for (int j = 0; j < processed.size(); j++) {
+                    out[i-processed.size()+1+j] = processed[j];
+                }
+            }
         }
 
         /* Tell runtime system how many input items we consumed on input stream. */
@@ -109,7 +116,7 @@ namespace gr {
     }
 
     /* function that processes the byte */
-    void 
+    std::vector<uint8_t>
     endurosat_frame_sync_bb_impl::process_byte( uint8_t byte ) {
         /* depending on the state, handle the byte differently */
         switch (state) {
@@ -207,24 +214,33 @@ namespace gr {
                     counter++;
 
                     if (counter == 16){
+                        std::cout << "==========================" << std::endl;
                         // std::cout << "CRC checksum is: " << packet_crc_checksum << '\n'; 
                         if( crc16(packet_data_field, packet_data_length) == packet_crc_checksum ) {
-                            std::cout << "==========================" << std::endl;
                             std::cout << "Packet received: " << std::endl;
                             std::cout << "Size: " << packet_data_field.size() << std::endl;
+                            std::cout << "Contents (HEX): " << std::endl;
                             for(int i=0; i<packet_data_field.size(); i++) {
                                 std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << int(packet_data_field[i]) << " ";
+                            }
+                            std::cout << std::endl;
+                            std::cout << "Contents (text): " << std::endl;
+                            for (int i = 0; i < packet_data_field.size(); i++) {   
+                                std::cout << (char)packet_data_field[i];
                             }
                             std::cout << std::endl;
                         } 
                         else {
                             std::cerr << "PACKET PROCESSED: BAD CRC" << std::endl;
                         }
+                        std::cout << "==========================" << std::endl;
 
                         // Clean up
+                        std::vector<uint8_t> output (packet_data_field);
                         clear_all_packet_reg();
                         counter = 0;
                         state = training_field_state;
+                        return output;
                     }
                 } 
                 
@@ -236,6 +252,7 @@ namespace gr {
                 break;
 
         }
+        return std::vector<uint8_t>();
     }
 
     /* clears all packet registers */

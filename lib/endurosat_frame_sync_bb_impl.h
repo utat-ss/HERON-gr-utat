@@ -62,7 +62,7 @@ namespace gr {
            gr_vector_const_void_star &input_items,
            gr_vector_void_star &output_items);
 
-        void process_byte(uint8_t byte);
+        std::vector<uint8_t> process_byte(uint8_t byte);
 
         void clear_all_packet_reg();
 
