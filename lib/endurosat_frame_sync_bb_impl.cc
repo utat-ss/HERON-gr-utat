@@ -214,16 +214,16 @@ namespace gr {
                     counter++;
 
                     if (counter == 16){
-                        std::cout << "==========================" << std::endl;
+                        std::cout << std::endl << std::endl << "==========================" << std::endl;
                         // std::cout << "CRC checksum is: " << packet_crc_checksum << '\n'; 
                         if( crc16(packet_data_field, packet_data_length) == packet_crc_checksum ) {
-                            std::cout << "Packet received: " << std::endl;
+                            std::cout << "PACKET RECEIVED! " << std::endl;
                             std::cout << "Size: " << packet_data_field.size() << std::endl;
                             std::cout << "Contents (HEX): " << std::endl;
                             for(int i=0; i<packet_data_field.size(); i++) {
                                 std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << int(packet_data_field[i]) << " ";
                             }
-                            std::cout << std::endl;
+                            std::cout << std::dec << std::endl;
                             std::cout << "Contents (text): " << std::endl;
                             for (int i = 0; i < packet_data_field.size(); i++) {   
                                 std::cout << (char)packet_data_field[i];
