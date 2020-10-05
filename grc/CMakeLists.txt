@@ -18,5 +18,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    utat_endurosat_frame_sync_bb.xml DESTINATION share/gnuradio/grc/blocks
+    utat_endurosat_frame_sync_bb.xml
+    utat_heron_rx.xml DESTINATION share/gnuradio/grc/blocks
 )

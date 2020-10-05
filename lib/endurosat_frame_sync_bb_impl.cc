@@ -213,10 +213,11 @@ namespace gr {
                     /* increment */
                     counter++;
 
-                    if (counter == 16){
+                    if (counter == 16) {
                         std::cout << std::endl << std::endl << "==========================" << std::endl;
                         // std::cout << "CRC checksum is: " << packet_crc_checksum << '\n'; 
                         if( crc16(packet_data_field, packet_data_length) == packet_crc_checksum ) {
+                        /* IF YOU GET HERE - YOU HAVE RECEIVED A VALID ENDUROSAT PACKET. */
                             std::cout << "PACKET RECEIVED! " << std::endl;
                             std::cout << "Size: " << packet_data_field.size() << std::endl;
                             std::cout << "Contents (HEX): " << std::endl;
@@ -229,6 +230,29 @@ namespace gr {
                                 std::cout << (char)packet_data_field[i];
                             }
                             std::cout << std::endl;
+                        /* YOU SHOULD NOW EXTRACT THE RELEVANT INFORMATION FROM THE UTAT FRAME WITHIN THAT */
+                            
+                            // Get length
+                            uint8_t dec_length = packet_data_field[1];
+
+                            // Get command ID & status
+                            // NB: Decoded message is from [3] to [3+length-1] so use [3+i]
+                            uint16_t cmd_id = (((uint16_t)packet_data_field[3] << 8) | (uint16_t)packet_data_field[4]);
+                            uint8_t status = packet_data_field[5];
+                            std::vector<uint8_t> data;
+
+                            // Check if it's a N/ACK or response
+                            if ((packet_data_field[3] & (0x1 << 7)) == 0x0) {
+                                // MSB is 0: is an ACK
+
+                            } else {
+
+                            }
+                            for (int i = 0; i < dec_length; i++) {
+
+                            }
+
+
                         } 
                         else {
                             std::cerr << "PACKET PROCESSED: BAD CRC" << std::endl;

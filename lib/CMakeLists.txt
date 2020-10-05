@@ -27,6 +27,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND utat_sources
     endurosat_frame_sync_bb_impl.cc
+    heron_rx_impl.cc
 )
 
 set(utat_sources "${utat_sources}" PARENT_SCOPE)

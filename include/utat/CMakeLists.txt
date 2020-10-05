@@ -22,5 +22,6 @@
 ########################################################################
 install(FILES
     api.h
-    endurosat_frame_sync_bb.h DESTINATION include/utat
+    endurosat_frame_sync_bb.h
+    heron_rx.h DESTINATION include/utat
 )
