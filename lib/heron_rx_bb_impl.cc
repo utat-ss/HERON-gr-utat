@@ -91,7 +91,7 @@ namespace gr {
                     for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
                         out[j] = d_pkt.data[j];
                     }
-                    out[d_pkt.size_byte] = 0x1D; // concatenate with a Carriage Return
+                    out[d_pkt.size_byte] = 0x0D; // concatenate with a Carriage Return
                 } else {
                     // 1b. IF CHECKSUM INVALID, print error message, flush out[]
                     std::cout << "PACKET FAILED - INVALID CHECKSUM" << std::endl;
