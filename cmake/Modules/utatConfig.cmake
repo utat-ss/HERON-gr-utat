@@ -22,9 +22,10 @@ FIND_LIBRARY(
           /usr/local/lib64
           /usr/lib
           /usr/lib64
-)
+          )
+
+include("${CMAKE_CURRENT_LIST_DIR}/utatTarget.cmake")
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(UTAT DEFAULT_MSG UTAT_LIBRARIES UTAT_INCLUDE_DIRS)
 MARK_AS_ADVANCED(UTAT_LIBRARIES UTAT_INCLUDE_DIRS)
-
