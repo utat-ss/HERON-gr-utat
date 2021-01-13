@@ -75,7 +75,7 @@ namespace gr {
         const uint8_t *in = (const uint8_t *) input_items[0];
         uint8_t *out = (uint8_t *) output_items[0];
 
-        // Do <+signal processing+>
+        // Do <+signal processin/g+>
         int num_bytes_processed = 0;
         int output_size = 0;
 
@@ -119,12 +119,24 @@ namespace gr {
             }
 
         }
-        // Tell runtime system how many input items we consumed on
-        // each input stream.
-        consume_each (num_bytes_processed);
+        
+        if (num_bytes_processed != 0) {
+            // IF FOUND A PACKET, FAILED OR NOT:
 
-        // Tell runtime system how many output items we produced.
-        return output_size;
+            // Tell runtime system how many input items we consumed on
+            // each input stream.
+            consume_each (num_bytes_processed);
+
+            // Tell runtime system how many output items we produced.
+            return output_size;
+        } else {
+            // IF DID NOT GET PACKET
+            for (int i = 0; i < noutput_items; i++) {
+                out[i] = in[i];
+            }
+            consume_each (noutput_items);
+            return noutput_items;
+        }
     }
 
     void
@@ -141,14 +153,15 @@ namespace gr {
                     d_pkt.preamble == d_pkt.preamble << 1;
                 }
                 // Check if you've got 31 or 32b of preamble - in which case, move on
-                if (d_pkt.preamble == 0x55555555) {
+                if (d_pkt.preamble == 0x555555) {
                     d_state = getting_sync_word;
+                    std::cout << " ::: Finished getting preamble ::: " << std::endl;
                 }
                 break;
 
             case getting_sync_word:
                 // No way to know if preamble ended aligned w previous step - use d_counter to quit if you don't find 0x7E soon
-                if (d_counter < 40) { // quasi-arbitrary : 32 or 33 should be sufficient, but 40 allows for some coincidental 010101 pattern before the real preamble
+                if (d_counter < 50) { // quasi-arbitrary : 32 or 33 should be sufficient, but 50 allows for some coincidental 010101 pattern before the real preamble
                     if (bit_byte == 0x01) {
                         d_pkt.sync_word == (d_pkt.sync_word << 1) + 1;
                     } else if (bit_byte == 0x00) {
@@ -159,6 +172,7 @@ namespace gr {
                     if (d_pkt.sync_word == 0x7E) {
                         d_counter = 0;
                         d_state = getting_size_byte;
+                        std::cout << " ::: Finished getting sync word ::: " << std::endl;
                     }
                 } else {
                     clear_packet(); // this resets the state and sets counter to 0
@@ -178,6 +192,7 @@ namespace gr {
                     if (d_counter == 8) {
                         d_counter = 0;
                         d_state = getting_data;
+                        std::cout << " ::: Finished getting size byte: " << d_pkt.size_byte << " bytes expected ::: " << std::endl;
                     }
                 }
                 break;
@@ -202,6 +217,7 @@ namespace gr {
                     if (d_counter == 8*d_pkt.size_byte) {
                         d_counter = 0;
                         d_state = getting_checksum;
+                        std::cout << " ::: Finished getting data ::: " << std::endl;
                     }
                 }
                 break;
@@ -218,6 +234,7 @@ namespace gr {
                     // Check if have full checksum
                     if (d_counter == 16) {
                         d_state = finished_packet;
+                        std::cout << " ::: Finished getting checksum ::: " << std::endl;
                     }
                 }
                 break;
