@@ -131,6 +131,7 @@ namespace gr {
             return output_size;
         } else {
             // IF DID NOT GET PACKET
+            // TODO: dvogel: Can set to output nothing, should change this once reliable
             for (int i = 0; i < noutput_items; i++) {
                 out[i] = in[i];
             }
@@ -148,10 +149,10 @@ namespace gr {
             case getting_preamble:
                 // Update stored preamble
                 if (bit_byte == 0x01) {
-                    d_pkt.preamble == (d_pkt.preamble << 1) + 1;
+                    d_pkt.preamble = (d_pkt.preamble << 1) + 1;
                 } else if (bit_byte == 0x00) {
-                    d_pkt.preamble == d_pkt.preamble << 1;
-                }
+                    d_pkt.preamble = d_pkt.preamble << 1;
+                }                
                 // Check if you've got 31 or 32b of preamble - in which case, move on
                 if (d_pkt.preamble == 0x555555) {
                     d_state = getting_sync_word;
@@ -163,9 +164,9 @@ namespace gr {
                 // No way to know if preamble ended aligned w previous step - use d_counter to quit if you don't find 0x7E soon
                 if (d_counter < 50) { // quasi-arbitrary : 32 or 33 should be sufficient, but 50 allows for some coincidental 010101 pattern before the real preamble
                     if (bit_byte == 0x01) {
-                        d_pkt.sync_word == (d_pkt.sync_word << 1) + 1;
+                        d_pkt.sync_word = (d_pkt.sync_word << 1) + 1;
                     } else if (bit_byte == 0x00) {
-                        d_pkt.sync_word == d_pkt.sync_word << 1;
+                        d_pkt.sync_word = d_pkt.sync_word << 1;
                     }
                     d_counter++;
                     // Check if you've got the right pattern - in which case, move on
@@ -183,9 +184,9 @@ namespace gr {
                 // Now have fixed-size fields, so use counter for that
                 if (d_counter < 8) {
                     if (bit_byte == 0x01) {
-                        d_pkt.size_byte == (d_pkt.size_byte << 1) + 1;
+                        d_pkt.size_byte = (d_pkt.size_byte << 1) + 1;
                     } else if (bit_byte == 0x00) {
-                        d_pkt.size_byte == d_pkt.size_byte << 1;
+                        d_pkt.size_byte = d_pkt.size_byte << 1;
                     }
                     d_counter++;
                     // Check if you're finished - if so, prep to move forward
@@ -208,9 +209,9 @@ namespace gr {
                     // Write to that new byte as you go
                     int byte_idx = (int)(d_counter/8); // Floor counter/8
                     if (bit_byte == 0x01) {
-                        d_pkt.data[byte_idx] == (d_pkt.data[byte_idx] << 1) + 1;
+                        d_pkt.data[byte_idx] = (d_pkt.data[byte_idx] << 1) + 1;
                     } else if (bit_byte == 0x00) {
-                        d_pkt.data[byte_idx] == d_pkt.data[byte_idx] << 1;
+                        d_pkt.data[byte_idx] = d_pkt.data[byte_idx] << 1;
                     }
                     d_counter++;
                     // Check if you're finished - if so, move on
@@ -225,9 +226,9 @@ namespace gr {
             case getting_checksum:
                 if (d_counter < 16) {
                     if (bit_byte == 0x01) {
-                        d_pkt.checksum == (d_pkt.checksum << 1) + 1;
+                        d_pkt.checksum = (d_pkt.checksum << 1) + 1;
                     } else if (bit_byte == 0x00) {
-                        d_pkt.checksum == d_pkt.checksum << 1;
+                        d_pkt.checksum = d_pkt.checksum << 1;
                     }
                     d_counter++;
 

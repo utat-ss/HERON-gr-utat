@@ -23,6 +23,7 @@
 
 #include <utat/heron_rx_bb.h>
 #include <utat/packet.h>
+#include <cstdint>
 #include <iostream>
 #include <vector> 
 
