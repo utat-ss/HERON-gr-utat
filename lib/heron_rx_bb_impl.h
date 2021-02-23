@@ -25,6 +25,7 @@
 #include <utat/packet.h>
 #include <cstdint>
 #include <iostream>
+#include <string>
 #include <vector> 
 
 namespace gr {

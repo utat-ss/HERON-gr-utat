@@ -108,7 +108,7 @@ namespace gr {
                 std::cout << std::dec;
                 std::cout << "Packet contents (regular text): " << std::endl;
                 for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                    std::cout << (char)d_pkt.data[j] << " ";
+                    std::cout << "0x" << std::to_string(d_pkt.data[j]) << " ";
                 }
                 std::cout << std::endl;
                 std::cout << "================================" << std::endl;
