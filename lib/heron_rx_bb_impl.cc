@@ -99,7 +99,7 @@ namespace gr {
                     out[0] = 0x1D; // send a carriage return just in case
                 }
                 // 2. Print packet content as HEX and TEXT 
-                std::cout << "Packet length: " << d_pkt.size_byte << std::endl;
+                std::cout << "Packet length: " << std::to_string(d_pkt.size_byte) << std::endl;
                 std::cout << "Packet contents (HEX): " << std::endl;
                 for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
                     std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (int)d_pkt.data[j] << " ";
@@ -132,11 +132,12 @@ namespace gr {
         } else {
             // IF DID NOT GET PACKET
             // TODO: dvogel: Can set to output nothing, should change this once reliable
-            for (int i = 0; i < noutput_items; i++) {
-                out[i] = in[i];
-            }
+            //for (int i = 0; i < noutput_items; i++) {
+            //    out[i] = in[i];
+            //}
             consume_each (noutput_items);
-            return noutput_items;
+            // return noutput_items;
+            return 0;
         }
     }
 
@@ -193,7 +194,7 @@ namespace gr {
                     if (d_counter == 8) {
                         d_counter = 0;
                         d_state = getting_data;
-                        std::cout << " ::: Finished getting size byte: " << d_pkt.size_byte << " bytes expected ::: " << std::endl;
+                        std::cout << " ::: Finished getting size byte: " << std::to_string(d_pkt.size_byte) << " bytes expected ::: " << std::endl;
                     }
                 }
                 break;
