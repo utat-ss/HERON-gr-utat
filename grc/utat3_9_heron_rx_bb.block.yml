@@ -1,0 +1,31 @@
+id: utat3_9_heron_rx_bb
+label: HERON RX BB
+category: '[utat3_9]'
+
+templates:
+  imports: import utat3_9
+  make: utat3_9.heron_rx_bb()
+
+#  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
+#  Keys include:
+#      * label (an identifier for the GUI)
+#      * domain (optional - stream or message. Default is stream)
+#      * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#      * vlen (optional - data stream vector length. Default is 1)
+#      * optional (optional - set to 1 for optional inputs. Default is 0)
+inputs:
+- label: in
+  domain: stream
+  dtype: byte
+
+outputs:
+- label: out
+  domain: stream
+  dtype: byte
+
+documentation: |- 
+  This block is the HERON RX OOT block. BB is for byte-to-byte, as it takes in an input byte stream
+  and outputs a byte stream (digital format).
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1
