@@ -6,10 +6,19 @@
  */
 
 #include <gnuradio/io_signature.h>
-#include "heron_rx_bb_impl.h"
+#include "heron_rx_bb_impl.h" // iostream included here
+#include <fstream> // https://www.cplusplus.com/doc/tutorial/files/
+
+
+
 
 namespace gr {
   namespace utat3_9 {
+
+    // =============== debug =================
+    std::string debug_path = "/home/yongdali/Documents/GitHub/UTAT_Space/ground-station/recordings/";
+
+    // =============================
 
     using input_type = uint8_t;
     using output_type = uint8_t;
@@ -29,6 +38,20 @@ namespace gr {
               gr::io_signature::make(1, 1, sizeof(uint8_t)),
               gr::io_signature::make(1, 1, sizeof(uint8_t)))
     {
+        // =======================================================
+        // debugging
+        // remove previous file
+        // just open a new file in regular open mode, and it'll overwrite previous content
+        std::ofstream myfile;
+        myfile.open (debug_path + "debug.txt");
+        myfile << "starting debug at time = " << std::time(0) << "\n";
+        myfile << "running constructor\n";
+
+        std::cout << "running constructor\n";
+
+        myfile.close();
+        // =======================================================
+
       d_state = getting_preamble;
       d_pkt.preamble = 0x00000000;
       d_pkt.sync_word = 0x00;
@@ -48,8 +71,17 @@ namespace gr {
     void
     heron_rx_bb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = noutput_items;
-      /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
+        // =======================================================
+        // debugging
+        std::cout<< "running forecast \n";
+
+        std::ofstream myfile;
+        myfile.open (debug_path + "debug.txt", std::ios::out | std::ios::app);
+        myfile << "running forecast\n";
+        // =======================================================
+
+          ninput_items_required[0] = noutput_items;
+          /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
     }
 
     int
@@ -58,7 +90,21 @@ namespace gr {
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-      const uint8_t *in = (const uint8_t *) input_items[0];
+        // =======================================================
+        // debugging
+        std::cout<< "running general work\n";
+
+
+        std::ofstream myfile;
+        myfile.open (debug_path + "debug.txt", std::ios::out | std::ios::app);
+
+        // set basefield format to decimal, since noutput_items is a decimal 
+        std::dec;
+        myfile << "running general work with noutput_items = " << noutput_items << "\n";
+        // =======================================================
+
+
+        const uint8_t *in = (const uint8_t *) input_items[0];
         uint8_t *out = (uint8_t *) output_items[0];
 
         int num_bytes_processed = 0;
@@ -70,7 +116,8 @@ namespace gr {
             if (d_state == finished_packet) {
                 if (crc16(d_pkt.data, d_pkt.size_byte) == d_pkt.checksum) {
                     // 1a) IF CHECKSUM VALID, set up output (out[] and output_size)
-                    std::cout << "PACKET RECEIVED - VALID CHECKSUM" << std::endl;
+
+                    myfile << "PACKET RECEIVED - VALID CHECKSUM" << std::endl;
                     output_size = (int)d_pkt.size_byte + 1;
                     for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
                         out[j] = d_pkt.data[j];
@@ -78,24 +125,24 @@ namespace gr {
                     out[d_pkt.size_byte] = 0x0D; // concatenate with a Carriage Return
                 } else {
                     // 1b) IF CHECKSUM INVALID, print error message, flush out[]
-                    std::cout << "PACKET FAILED - INVALID CHECKSUM" << std::endl;
+                    myfile << "PACKET FAILED - INVALID CHECKSUM" << std::endl;
                     output_size = 1;
                     out[0] = 0x0D; // send a carriage return
                 }
                 // 2) Print packet content as HEX and TEXT 
-                std::cout << "Packet length: " << std::to_string(d_pkt.size_byte) << std::endl;
-                std::cout << "Packet contents (HEX): " << std::endl;
+                myfile << "Packet length: " << std::to_string(d_pkt.size_byte) << std::endl;
+                myfile << "Packet contents (HEX): " << std::endl;
                 for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                    std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (int)d_pkt.data[j] << " ";
+                    myfile << "0x" << std::setfill('0') << std::setw(2) << std::hex << (int)d_pkt.data[j] << " ";
                 }
-                std::cout << std::endl;
-                std::cout << std::dec;
-                std::cout << "Packet contents (regular text): " << std::endl;
+                myfile << std::endl;
+                myfile << std::dec;
+                myfile << "Packet contents (regular text): " << std::endl;
                 for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                    std::cout << "0x" << std::to_string(d_pkt.data[j]) << " ";
+                    myfile << "0x" << std::to_string(d_pkt.data[j]) << " ";
                 }
-                std::cout << std::endl;
-                std::cout << "================================" << std::endl;
+                myfile << std::endl;
+                myfile << "================================" << std::endl;
                 // 3. Clean up "register" values and exit
                 clear_packet();
                 num_bytes_processed = i;
@@ -120,33 +167,50 @@ namespace gr {
             //    out[i] = in[i];
             //}
             consume_each (noutput_items);
+
+            myfile << "did not get a packet in general_work\n";
             // return noutput_items;
             return 0;
         }
+
+        myfile.close();
     }
 
     void
     heron_rx_bb_impl::process_byte (uint8_t bit_byte)
     {
+
+        std::ofstream myfile;
+        myfile.open (debug_path + "debug.txt", std::ios::out | std::ios::app);
+
+        // set baesfield format to hex, for d_pkt.preamble
+        std::hex;
+        char buf[1000];
+        snprintf(buf, 1000, "entering process_byte with d_pkt.preamble = %#X\n", d_pkt.preamble);
+        myfile << buf;
+
         // This block goes before a Pack K(8) Bits block because we need flexible alignment - it will pack them on the output
         switch (d_state) {
             case getting_preamble:
+                myfile << "getting preamble\n";
                 // Update stored preamble
                 if (bit_byte == 0x01) {
                     d_pkt.preamble = (d_pkt.preamble << 1) + 1;
                 } else if (bit_byte == 0x00) {
                     d_pkt.preamble = d_pkt.preamble << 1;
                 } else {
-                  std::cout << " Don't use Pack K Bits before this block, must be 0x00 or 0x01 input." << std::endl;
+                  myfile << " Don't use Pack K Bits before this block, must be 0x00 or 0x01 input." << std::endl;
                 }            
                 // Once you get 31b or 32b of preamble, update state and get the sync word.
                 if (d_pkt.preamble == 0x555555) {
                     d_state = getting_sync_word;
-                    std::cout << " ::: Finished getting preamble ::: " << std::endl;
+                    myfile << " ::: Finished getting preamble ::: " << std::endl;
                 }
                 break;
 
             case getting_sync_word:
+                myfile << "getting sync word\n";
+
                 // No way to know if preamble ended aligned w previous step - use d_counter to quit if you don't find 0x7E soon
                 if (d_counter < 50) { // 32 or 33 should be sufficient, but 50 allows for some coincidental 010101 pattern before the real preamble
                     if (bit_byte == 0x01) {
@@ -159,7 +223,7 @@ namespace gr {
                     if (d_pkt.sync_word == 0x7E) {
                         d_counter = 0;
                         d_state = getting_size_byte;
-                        std::cout << " ::: Finished getting sync word ::: " << std::endl;
+                        myfile << " ::: Finished getting sync word ::: " << std::endl;
                     }
                 } else {
                     clear_packet(); // this resets the state and sets counter to 0
@@ -167,6 +231,7 @@ namespace gr {
                 break;
 
             case getting_size_byte:
+                myfile << "getting size byte\n";
                 // Now have fixed-size fields, so use counter for that
                 if (d_counter < 8) {
                     if (bit_byte == 0x01) {
@@ -179,12 +244,14 @@ namespace gr {
                     if (d_counter == 8) {
                         d_counter = 0;
                         d_state = getting_data;
-                        std::cout << " ::: Finished getting size byte: " << std::to_string(d_pkt.size_byte) << " bytes expected ::: " << std::endl;
+                        myfile << " ::: Finished getting size byte: " << std::to_string(d_pkt.size_byte) << " bytes expected ::: " << std::endl;
                     }
                 }
                 break;
 
             case getting_data:
+                myfile << "getting data\n";
+
                 // Use d_pkt.size_byte to get fixed size of the data field
                 //   e.g. if d_pkt.size_byte == 0x0A, should be reading 10 bytes == 80 "bit bytes"
                 if (d_counter < 8*d_pkt.size_byte) { // -- will always end on counter % 8 == 7, which is good
@@ -204,12 +271,13 @@ namespace gr {
                     if (d_counter == 8*d_pkt.size_byte) {
                         d_counter = 0;
                         d_state = getting_checksum;
-                        std::cout << " ::: Finished getting data ::: " << std::endl;
+                        myfile << " ::: Finished getting data ::: " << std::endl;
                     }
                 }
                 break;
 
             case getting_checksum:
+                myfile << "getting checksum\n";
                 if (d_counter < 16) {
                     if (bit_byte == 0x01) {
                         d_pkt.checksum = (d_pkt.checksum << 1) + 1;
@@ -221,17 +289,21 @@ namespace gr {
                     // Check if have full checksum
                     if (d_counter == 16) {
                         d_state = finished_packet;
-                        std::cout << " ::: Finished getting checksum ::: " << std::endl;
+                        myfile << " ::: Finished getting checksum ::: " << std::endl;
                     }
                 }
                 break;
 
 
             default:
+                myfile << "defaulted out\n";
+
                 clear_packet();
                 d_state = getting_preamble;
                 break;
         }
+
+        myfile.close();
     }
 
     void
