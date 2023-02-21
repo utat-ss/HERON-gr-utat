@@ -1,0 +1,6 @@
+/*!
+ * \defgroup block GNU Radio UTAT_HERON C++ Signal Processing Blocks
+ * \brief All C++ blocks that can be used from the UTAT_HERON GNU Radio
+ *        module are listed here or in the subcategories below.
+ *
+ */
