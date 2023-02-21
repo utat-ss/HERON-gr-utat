@@ -71,8 +71,9 @@ int heron_rx_bb_impl::general_work(int noutput_items,
         if (d_state == finished_packet) {
             if (crc16(d_pkt.data, d_pkt.size_byte) == d_pkt.checksum) {
                 // 1a) IF CHECKSUM VALID, set up output (out[] and output_size)
-
+                #ifdef DEBUG_FILE
                 debug_file << "PACKET RECEIVED - VALID CHECKSUM" << std::endl;
+                #endif
                 output_size = (int)d_pkt.size_byte + 1;
                 for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
                     out[j] = d_pkt.data[j];
