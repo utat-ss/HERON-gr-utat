@@ -11,6 +11,5 @@
 ########################################################################
 install(FILES
     api.h
-    heron_rx_bb.h
-    packet.h DESTINATION include/gnuradio/UTAT_HERON
+    heron_rx_bb.h DESTINATION include/gnuradio/UTAT_HERON
 )

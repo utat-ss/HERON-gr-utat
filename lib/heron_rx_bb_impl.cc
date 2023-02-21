@@ -156,15 +156,7 @@ heron_rx_bb_impl::process_byte (uint8_t bit_byte)
             debug_file << "getting preamble\n";
             #endif
             // Update stored preamble
-            if (bit_byte == 0x01) {
-                d_pkt.preamble = (d_pkt.preamble << 1) + 1;
-            } else if (bit_byte == 0x00) {
-                d_pkt.preamble = d_pkt.preamble << 1;
-            } else {
-                #ifdef DEBUG_FILE
-                debug_file << " Don't use Pack K Bits before this block, must be 0x00 or 0x01 input." << std::endl;
-                #endif
-            }            
+            append_bit(bit_byte, d_pkt.preamble);
             // Once you get 31b or 32b of preamble, update state and get the sync word.
             if ((d_pkt.preamble & 0xFFFFFFFF) == 0xAAAAAAAA) {
                 d_state = getting_sync_word;
@@ -181,11 +173,7 @@ heron_rx_bb_impl::process_byte (uint8_t bit_byte)
 
             // No way to know if preamble ended aligned w previous step - use d_counter to quit if you don't find 0x7E soon
             if (d_counter < 50) { // 32 or 33 should be sufficient, but 50 allows for some coincidental 010101 pattern before the real preamble
-                if (bit_byte == 0x01) {
-                    d_pkt.sync_word = (d_pkt.sync_word << 1) + 1;
-                } else if (bit_byte == 0x00) {
-                    d_pkt.sync_word = d_pkt.sync_word << 1;
-                }
+                append_bit(bit_byte, d_pkt.sync_word);
                 d_counter++;
                 // Once you get the right sync word, update the state and move to get the byte size.
                 if ((d_pkt.sync_word & 0xFF) == 0x7E) {
@@ -206,11 +194,7 @@ heron_rx_bb_impl::process_byte (uint8_t bit_byte)
             #endif
             // Now have fixed-size fields, so use counter for that
             if (d_counter < 8) {
-                if (bit_byte == 0x01) {
-                    d_pkt.size_byte = (d_pkt.size_byte << 1) + 1;
-                } else if (bit_byte == 0x00) {
-                    d_pkt.size_byte = d_pkt.size_byte << 1;
-                }
+                append_bit(bit_byte, d_pkt.size_byte);
                 d_counter++;
                 // Once you've read in the fixed byte size field, print the size out and update the state.
                 if (d_counter == 8) {
@@ -237,11 +221,7 @@ heron_rx_bb_impl::process_byte (uint8_t bit_byte)
                 }
                 // Write to that new byte as you go
                 int byte_idx = (int)(d_counter/8); // Floor counter/8
-                if (bit_byte == 0x01) {
-                    d_pkt.data[byte_idx] = (d_pkt.data[byte_idx] << 1) + 1;
-                } else if (bit_byte == 0x00) {
-                    d_pkt.data[byte_idx] = d_pkt.data[byte_idx] << 1;
-                }
+                append_bit(bit_byte, d_pkt.data[byte_idx]);
                 d_counter++;
                 // Once the data has been read out, print that the process is done, then move to checksum. 
                 if (d_counter == 8*d_pkt.size_byte) {
@@ -259,13 +239,8 @@ heron_rx_bb_impl::process_byte (uint8_t bit_byte)
             debug_file << "getting checksum\n";
             #endif
             if (d_counter < 16) {
-                if (bit_byte == 0x01) {
-                    d_pkt.checksum = (d_pkt.checksum << 1) + 1;
-                } else if (bit_byte == 0x00) {
-                    d_pkt.checksum = d_pkt.checksum << 1;
-                }
+                append_bit(bit_byte, d_pkt.checksum);
                 d_counter++;
-
                 // Check if have full checksum
                 if (d_counter == 16) {
                     d_state = finished_packet;
@@ -288,6 +263,19 @@ heron_rx_bb_impl::process_byte (uint8_t bit_byte)
 
 }
 
+template<typename T> void
+heron_rx_bb_impl::append_bit(uint8_t bit, T& data){
+    if (bit == 0x01) {
+        data = (data << 1) + 1;
+    } else if (bit == 0x00) {
+        data = data << 1;
+    }else{
+        #ifdef DEBUG_FILE
+        debug_file << "!!! Don't use Pack K Bits before this block, must be 0x00 or 0x01 input !!!" << std::endl;
+        #endif
+    }
+}
+
 void
 heron_rx_bb_impl::clear_packet(){
     d_state = getting_preamble;
@@ -300,7 +288,7 @@ heron_rx_bb_impl::clear_packet(){
 }
 
 uint16_t
-heron_rx_bb_impl::crc16(const std::vector<uint8_t> &data, uint8_t data_length)
+heron_rx_bb_impl::crc16(const std::deque<uint8_t> &data, uint8_t data_length)
 {
     // Uses the "CRC16/CCITT-FALSE implementation from https://crccalc.com
     uint16_t poly = 0x1021;

@@ -27,9 +27,8 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
 
     def test_instance(self):
         instance = heron_rx_bb()
-        instance = None # ensure debug_file is closed
+        del instance # ensure debug_file is closed
 
-    # FAILING
     def test_001_single_byte(self):
         samp_rate = 1e6
         input = [
@@ -50,8 +49,9 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         self.tb.run()
         output = dst.data()
         self.assertEqual(expected, output)
-        rx = None
+        del rx # ensure debug_file is closed
     
+    # FAILING
     def test_002_multiple_bytes(self):
         samp_rate = 1e6
         input = [
@@ -83,7 +83,7 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         self.tb.run()
         output = dst.data()
         self.assertEqual(expected, output)
-        rx = None
+        del rx # ensure debug_file is closed
 
     def test_003_multiple_bytes(self):
         samp_rate = 1e6
@@ -120,7 +120,7 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         self.tb.run()
         output = dst.data()
         self.assertEqual(expected, output)
-        rx = None
+        del rx # ensure debug_file is closed
 
 
 if __name__ == '__main__':
