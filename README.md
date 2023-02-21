@@ -5,7 +5,6 @@ A GNURadio out-of-tree module for the HERON Mk II ground station.
 The [ground-station](https://github.com/HeronMkII/ground-station) repository has some notes and instructions, but we are in the process of moving everything pertaining to this block to this repository.
 
 ## How to create this repository from scratch
----
 
 ```
 gr_modtool newmod UTAT_HERON
@@ -22,9 +21,8 @@ gr_modtool bind heron_rx_bb
 The above will provide a template code where you can now copy over the existing code from this repository. DO NOT copy the files, only copy the contents of provided functions and helper functions. It is recommended to remove unnecessary comments.
 
 ## Blocks
----
 
-## heron_rx_bb (HAS BUGS)
+### heron_rx_bb (HAS BUGS)
 
 Useful links:
 1. [Endurosat Tranceiver onboard HERON Mk II](https://www.endurosat.com/cubesat-store/cubesat-communication-modules/uhf-transceiver-ii/#request-step-modal)
