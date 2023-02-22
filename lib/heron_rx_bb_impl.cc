@@ -6,6 +6,7 @@
  */
 
 #include "heron_rx_bb_impl.h"
+#include "debug_logger.h"
 #include <gnuradio/io_signature.h>
 #include <iomanip>
 
@@ -26,12 +27,11 @@ heron_rx_bb_impl::heron_rx_bb_impl()
         gr::io_signature::make(1, 1, sizeof(input_type)),
         gr::io_signature::make(1, 1, sizeof(output_type)))
 {
-    #ifdef DEBUG_FILE
-    debug_file.open(DEBUG_FILE, std::ios_base::out);
-    debug_file << "starting debug at time = " << std::time(0) << '\n';
-    debug_file << "running constructor\n";
-    debug_file << std::hex;
-    std::cout << "running constructor, debug: " << DEBUG_FILE << '\n';
+    #ifdef DEBUG_LOGGER
+    debug_logger << "starting debug at time = " << std::time(0) << '\n';
+    debug_logger << "running constructor\n";
+    debug_logger << std::hex;
+    debug_logger << "running constructor, debug: " << DEBUG_FILE << '\n';
     #endif
 
     d_pkt.clear();
@@ -153,7 +153,6 @@ heron_rx_bb_impl::process_byte (uint8_t bit)
 
         case getting_checksum:
         
-
             d_pkt.append_bit_to_checksum(bit);
 
             DEBUG_STREAM("getting checksum: " << d_pkt.checksum << '\n');
@@ -162,22 +161,21 @@ heron_rx_bb_impl::process_byte (uint8_t bit)
 
                 DEBUG_STREAM(" ::: Finished getting checksum ::: " << std::endl);
 
-                if(crc16(d_pkt.data, d_pkt.size_byte) == d_pkt.checksum){
-
-                    #ifdef DEBUG_FILE
-                    debug_file << "PACKET RECEIVED - VALID CHECKSUM\n";
-                    debug_file << "Packet length: " << std::to_string(d_pkt.size_byte) << std::endl;
-                    debug_file << "Packet contents (HEX): " << std::endl;
+                if(d_pkt.checksum_matches()){
+                    #ifdef DEBUG_LOGGER
+                    debug_logger << "PACKET RECEIVED - VALID CHECKSUM\n";
+                    debug_logger << "Packet length: " << std::to_string(d_pkt.size_byte) << std::endl;
+                    debug_logger << "Packet contents (HEX): " << std::endl;
                     for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                        debug_file << "0x" << std::setfill('0') << std::setw(2) << (int)d_pkt.data[j] << " ";
+                        debug_logger << "0x" << std::setfill('0') << std::setw(2) << (int)d_pkt.data[j] << " ";
                     }
-                    debug_file << std::endl;
-                    debug_file << "Packet contents (regular text): " << std::endl;
+                    debug_logger << std::endl;
+                    debug_logger << "Packet contents (regular text): " << std::endl;
                     for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                        debug_file << d_pkt.data[j] << " ";
+                        debug_logger << d_pkt.data[j] << " ";
                     }
-                    debug_file << std::endl;
-                    debug_file << "================================" << std::endl;
+                    debug_logger << std::endl;
+                    debug_logger << "================================" << std::endl;
                     #endif
 
                     d_pkt.counter = 0;
@@ -199,43 +197,6 @@ heron_rx_bb_impl::process_byte (uint8_t bit)
             break;
     }
 
-}
-uint16_t
-heron_rx_bb_impl::crc16(const std::deque<uint8_t> &data, uint8_t data_length)
-{
-    // Uses the "CRC16/CCITT-FALSE implementation from https://crccalc.com
-    uint16_t poly = 0x1021;
-    uint16_t data_byte = 0x0000;
-    uint16_t crc = 0xFFFF;
-
-    /* calculate value with data_length as input */
-    data_byte = data_length;
-    data_byte <<= 8;
-    for(int i=0; i<8; i++) {
-        uint16_t xor_flag = (crc ^ data_byte) & 0x8000;
-        crc <<= 1;
-        if(xor_flag) {
-            crc ^= poly;
-        }
-        data_byte <<= 1;
-    }
-
-    /* calculate crc value for the rest of the datafields */
-    for(size_t i=0; i < data.size(); i++){
-        data_byte = data[i];
-        data_byte <<= 8;
-        for(int i=0; i<8; i++) {
-            uint16_t xor_flag = (crc ^ data_byte) & 0x8000;
-            crc <<= 1;
-            if(xor_flag) {
-                crc ^= poly;
-            }
-            data_byte <<= 1;
-        }
-    }
-
-    /* return crc_value */
-    return crc;
 }
 
 }

@@ -8,18 +8,11 @@
 #ifndef INCLUDED_UTAT_HERON_HERON_RX_BB_IMPL_H
 #define INCLUDED_UTAT_HERON_HERON_RX_BB_IMPL_H
 
-#include "heron_packet.h"
+#include "heron_packet_manager.h"
 #include <gnuradio/UTAT_HERON/heron_rx_bb.h>
 #include <string>
 #include <cstdint>
 #include <deque>
-#include <fstream>
-
-#ifdef DEBUG_FILE
-#define DEBUG_STREAM(x) debug_file << x
-#else
-#define DEBUG_STREAM(x)
-#endif
 
 namespace gr {
 namespace UTAT_HERON {
@@ -27,10 +20,7 @@ namespace UTAT_HERON {
 class heron_rx_bb_impl : public heron_rx_bb
 {
 private:
-    #ifdef DEBUG_FILE
-    std::ofstream debug_file;
-    #endif
-    heron_packet d_pkt;
+    heron_packet_manager d_pkt;
 public:
     heron_rx_bb_impl();
     ~heron_rx_bb_impl();
@@ -40,7 +30,6 @@ public:
                      gr_vector_const_void_star& input_items,
                      gr_vector_void_star& output_items);
     void process_byte(uint8_t bit_byte);
-    uint16_t crc16(const std::deque<uint8_t> &data, uint8_t data_length);
 };
 
 }

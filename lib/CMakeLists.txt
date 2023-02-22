@@ -14,8 +14,10 @@ include(GrPlatform) #define LIB_SUFFIX
 list(APPEND UTAT_HERON_sources
     heron_rx_bb_impl.cc
     heron_rx_bb_impl.h
-    heron_packet.cc
-    heron_packet.h
+    heron_packet_manager.cc
+    heron_packet_manager.h
+    debug_logger.cc
+    debug_logger.h
 )
 
 set(UTAT_HERON_sources "${UTAT_HERON_sources}" PARENT_SCOPE)
@@ -32,7 +34,7 @@ target_include_directories(gnuradio-UTAT_HERON
   )
 set_target_properties(gnuradio-UTAT_HERON PROPERTIES DEFINE_SYMBOL "gnuradio_UTAT_HERON_EXPORTS")
 target_compile_definitions(gnuradio-UTAT_HERON PUBLIC
-    $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG_FILE="$ENV{HOME}/Desktop/utat_heron_debug.txt">)
+    $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG_FILE="${CMAKE_BINARY_DIR}/debug_log.txt">)
 
 if(APPLE)
     set_target_properties(gnuradio-UTAT_HERON PROPERTIES
