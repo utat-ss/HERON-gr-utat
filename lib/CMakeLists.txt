@@ -31,7 +31,8 @@ target_include_directories(gnuradio-UTAT_HERON
     PUBLIC $<INSTALL_INTERFACE:include>
   )
 set_target_properties(gnuradio-UTAT_HERON PROPERTIES DEFINE_SYMBOL "gnuradio_UTAT_HERON_EXPORTS")
-target_compile_definitions(gnuradio-UTAT_HERON PUBLIC $<$<CONFIG:Debug>:DEBUG_FILE="$ENV{HOME}/Desktop/utat_heron_debug.txt">)
+target_compile_definitions(gnuradio-UTAT_HERON PUBLIC
+    $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG_FILE="$ENV{HOME}/Desktop/utat_heron_debug.txt">)
 
 if(APPLE)
     set_target_properties(gnuradio-UTAT_HERON PROPERTIES

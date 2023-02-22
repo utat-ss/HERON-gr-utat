@@ -17,6 +17,12 @@ except ImportError:
     sys.path.append(os.path.join(dirname, "bindings"))
     from gnuradio.UTAT_HERON import heron_rx_bb
 
+# ====================================================
+# run tests individually to get proper debug file output.
+# disable test by adding underscore in front of name of
+# the function that starts with the word "test".
+# ====================================================
+
 class qa_heron_rx_bb(gr_unittest.TestCase):
 
     def setUp(self):
@@ -25,11 +31,10 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
     def tearDown(self):
         self.tb = None
 
-    def _test_instance(self):
+    def test_instance(self):
         instance = heron_rx_bb()
-        del instance # ensure debug_file is closed
 
-    def _test_001_single_byte(self):
+    def test_001_single_byte(self):
         samp_rate = 1e6
         input = [
             0xAA,0xAA,0xAA,0xAA,0xAA,0x7E,1,0x69,0xD3,0xB1
@@ -41,7 +46,7 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         src = blocks.vector_source_b(input, False, 1, [])
         unpack = blocks.unpack_k_bits_bb(8)
         rx = heron_rx_bb()
-        # rx.set_max_noutput_items(len(expected))
+        rx.set_max_noutput_items(len(expected))
         dst = blocks.vector_sink_b()
         self.tb.connect(src, unpack)
         self.tb.connect(unpack, rx)
@@ -49,10 +54,8 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         self.tb.run()
         output = dst.data()
         self.assertEqual(expected, output)
-        del rx # ensure debug_file is closed
     
-    # FAILING
-    def _test_002_multiple_bytes(self):
+    def test_002_multiple_bytes(self):
         samp_rate = 1e6
         input = [
             0xAB,0xAB,0xBA,0xFA,0x24,
@@ -75,7 +78,7 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         src = blocks.vector_source_b(input, False, 1, [])
         unpack = blocks.unpack_k_bits_bb(8)
         rx = heron_rx_bb()
-        # rx.set_max_noutput_items(len(expected))
+        rx.set_max_noutput_items(len(expected))
         dst = blocks.vector_sink_b()
         self.tb.connect(src, unpack)
         self.tb.connect(unpack, rx)
@@ -83,12 +86,10 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         self.tb.run()
         output = dst.data()
         self.assertEqual(expected, output)
-        del rx # ensure debug_file is closed
 
-    def test_003_multiple_bytes(self):
+    def test_003_timeout(self):
         samp_rate = 1e6
         input = [
-            0xAB,0xAB,0xBA,0xFA,0x24,
             0xAB,0xAB,0xBA,0xFA,0x24,
             0xAB,0xAB,0xBA,0xFA,0x24,
             0xAA,0xAA,0xAA,0xAA,0xAA,0x7E,1,0x01,0x3E,0x1F,
@@ -97,10 +98,10 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
             0xAB,0xAB,0xBA,0xFA,0x24,
             0xAA,0xAA,0xAA,0xAA,0xAA,0x7E,6,0x69,0x69,0x69,0x69,0x69,0x69,0x15,0xD3,
             0xAA,0xAA,0xAA,0xAA,0xAA,0x7E,6,0x69,0x69,0x69,0x69,0x69,0x69,0x15,0xD3,
-            0xAB,0xAB,0xBA,0xFA,0x24,
-            0xAB,0xAB,0xBA,0xFA,0x24,
-            0xAB,0xAB,0xBA,0xFA,0x24,
-            0xAB,0xAB,0xBA,0xFA,0x24
+            0xAA,0xAA,0xAA,0xAA,0xAA,
+            0xAA,0xAA,0xAA,0xAA,0xAA,0x7E,6,0x69,0x69,0x69,0x69,0x69,0x69,0x15,0xD3, # should timeout
+            0xAA,0xAA,0xAA,0xAA,0xAA,
+            0xAB,0xAB,0xBA,0xFA,0x24, # shoudld timeout
         ]
         expected = [
             0x01,0x0D,
@@ -112,7 +113,7 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         src = blocks.vector_source_b(input, False, 1, [])
         unpack = blocks.unpack_k_bits_bb(8)
         rx = heron_rx_bb()
-        # rx.set_max_noutput_items(len(expected))
+        rx.set_max_noutput_items(len(expected))
         dst = blocks.vector_sink_b()
         self.tb.connect(src, unpack)
         self.tb.connect(unpack, rx)
@@ -120,7 +121,6 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         self.tb.run()
         output = dst.data()
         self.assertEqual(expected, output)
-        del rx # ensure debug_file is closed
 
 
 if __name__ == '__main__':

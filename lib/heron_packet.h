@@ -7,6 +7,15 @@
 namespace gr {
 namespace UTAT_HERON {
 
+enum rx_recog_state {
+    getting_preamble,
+    getting_sync_word,
+    getting_size_byte,
+    getting_data,
+    getting_checksum,
+    finished_packet,
+};
+
 class heron_packet {
 private:
 
@@ -20,6 +29,7 @@ public:
     std::deque<uint8_t> data;
     uint16_t checksum;
     int counter;
+    rx_recog_state state;
 
     void clear();
     bool preamble_identified();
@@ -33,6 +43,7 @@ public:
     void append_bit_to_data(uint8_t bit);
     void append_bit_to_checksum(uint8_t bit);
     bool sync_word_timeout();
+    uint8_t pop_data_if_avail();
 };
 
 }

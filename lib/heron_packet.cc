@@ -11,6 +11,7 @@ namespace UTAT_HERON{
         data.clear();
         checksum = 0x0000;
         counter = 0;
+        state = getting_preamble;
     }
 
     bool heron_packet::preamble_identified(){
@@ -70,6 +71,13 @@ namespace UTAT_HERON{
     void heron_packet::append_bit_to_checksum(uint8_t bit){
         append_bit(bit, checksum);
         counter++;
+    }
+
+    uint8_t heron_packet::pop_data_if_avail(){
+        uint8_t ret = data.front();
+        data.pop_front();
+        if(data.empty()) this->clear();
+        return ret;
     }
 
 }

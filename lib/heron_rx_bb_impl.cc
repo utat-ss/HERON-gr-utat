@@ -30,10 +30,11 @@ heron_rx_bb_impl::heron_rx_bb_impl()
     debug_file.open(DEBUG_FILE, std::ios_base::out);
     debug_file << "starting debug at time = " << std::time(0) << '\n';
     debug_file << "running constructor\n";
+    debug_file << std::hex;
     std::cout << "running constructor, debug: " << DEBUG_FILE << '\n';
     #endif
 
-    clear_packet();
+    d_pkt.clear();
 }
 
 heron_rx_bb_impl::~heron_rx_bb_impl(){
@@ -43,7 +44,13 @@ heron_rx_bb_impl::~heron_rx_bb_impl(){
 void heron_rx_bb_impl::forecast(int noutput_items, gr_vector_int& ninput_items_required)
 {
     DEBUG_STREAM("running forecast\n");
-    ninput_items_required[0] = noutput_items;
+
+    float data_len = 128.f/2; // how big data field 2 is expeceted to be in bytes
+    float dec_per_packet = 9.f; // dec = decoration = prefix + suffix (in bytes)
+    float packet_len = data_len + dec_per_packet;
+    float npackets = noutput_items / (data_len+1); // add 1 for extra carrige return
+
+    ninput_items_required[0] = (int)(8*npackets*packet_len);
 }
 
 int heron_rx_bb_impl::general_work(int noutput_items,
@@ -54,124 +61,81 @@ int heron_rx_bb_impl::general_work(int noutput_items,
     auto in = static_cast<const input_type*>(input_items[0]);
     auto out = static_cast<output_type*>(output_items[0]);
 
-    int num_bytes_processed = 0;
-    int output_size = 0;
-
+    DEBUG_STREAM(std::dec);
     DEBUG_STREAM("running general work with noutput_items = " << noutput_items << '\n');
+    DEBUG_STREAM(std::hex);
 
-    for (int i = 0; i < noutput_items; i++) {
-        // Assume will be consuming noutput_items (full size), and leave if we find a packet
-        process_byte ( in[i] );
-        if (d_state == finished_packet) {
-            if (crc16(d_pkt.data, d_pkt.size_byte) == d_pkt.checksum) {
-                // 1a) IF CHECKSUM VALID, set up output (out[] and output_size)
-                DEBUG_STREAM("PACKET RECEIVED - VALID CHECKSUM\n");
-                output_size = (int)d_pkt.size_byte + 1;
-                for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                    out[j] = d_pkt.data[j];
-                }
-                out[d_pkt.size_byte] = 0x0D; // concatenate with a Carriage Return
-            } else {
-                // 1b) IF CHECKSUM INVALID, print error message, flush out[]
-                DEBUG_STREAM("PACKET FAILED - INVALID CHECKSUM\n");
-                output_size = 1;
-                out[0] = 0x0D; // send a carriage return
-            }
-            // 2) Print packet content as HEX and TEXT 
-            #ifdef DEBUG_FILE
-            debug_file << "Packet length: " << std::to_string(d_pkt.size_byte) << std::endl;
-            debug_file << "Packet contents (HEX): " << std::endl;
-            for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                debug_file << "0x" << std::setfill('0') << std::setw(2) << std::hex << (int)d_pkt.data[j] << " ";
-            }
-            debug_file << std::endl;
-            debug_file << std::dec;
-            debug_file << "Packet contents (regular text): " << std::endl;
-            for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                debug_file << d_pkt.data[j] << " ";
-            }
-            debug_file << std::endl;
-            debug_file << "================================" << std::endl;
-            #endif
-            // 3. Clean up "register" values and exit
-            clear_packet();
-            num_bytes_processed = i;
-            break;
+    const int ninput_max = ninput_items[0];
+    const int noutput_max = noutput_items;
+
+    int ninput = 0; // number of bytes actually processed
+    int noutput = 0; // number of bytes actually outputted
+
+    auto fill_output_buf_if_available = [&](){
+        while(d_pkt.state == finished_packet && noutput < noutput_max){
+            out[noutput] = d_pkt.pop_data_if_avail();
+            noutput++;
         }
+    };
 
+    fill_output_buf_if_available();
+
+    while(ninput < ninput_max && noutput < noutput_max){
+        process_byte(in[ninput]);
+        ninput++;
+        fill_output_buf_if_available();
     }
-    
-    if (num_bytes_processed != 0) {
-        // IF FOUND A PACKET, FAILED OR NOT:
 
-        // Tell runtime system how many input items we consumed on
-        // each input stream.
-        consume_each (num_bytes_processed);
-
-        // Tell runtime system how many output items we produced.
-        return output_size;
-    } else {
-        // IF DID NOT GET PACKET
-        // TODO: Update this to output something, right now it just outputs 0.
-        //for (int i = 0; i < noutput_items; i++) {
-        //    out[i] = in[i];
-        //}
-        consume_each (noutput_items);
-
-        DEBUG_STREAM("did not get a packet in general_work\n");
-        // return noutput_items;
-        return 0;
-    }
+    consume_each(ninput);
+    return noutput;
 
 }
 
 void
-heron_rx_bb_impl::process_byte (uint8_t bit_byte)
+heron_rx_bb_impl::process_byte (uint8_t bit)
 {
 
-    // set baesfield format to hex, for d_pkt.preamble
-    #ifdef DEBUG_FILE
-    std::hex;
-    char buf[1000];
-    snprintf(buf, 1000, "entering process_byte with d_pkt.preamble = %#X\n", d_pkt.preamble);
-    debug_file << buf;
-    #endif
+    switch (d_pkt.state) {
 
-    // This block goes before a Pack K(8) Bits block because we need flexible alignment - it will pack them on the output
-    switch (d_state) {
         case getting_preamble:
 
-            DEBUG_STREAM("getting preamble\n");
+            d_pkt.append_bit_to_preamble(bit);
 
-            d_pkt.append_bit_to_preamble(bit_byte);
+            DEBUG_STREAM("getting preamble: 0x" << d_pkt.preamble << '\n');
+
             if (d_pkt.preamble_identified()) {
-                d_state = getting_sync_word;
+                d_pkt.state = getting_sync_word;
                 DEBUG_STREAM(" ::: Finished getting preamble ::: " << std::endl);
             }
             break;
 
         case getting_sync_word:
 
-            DEBUG_STREAM("getting sync word\n");
+            d_pkt.append_bit_to_sync_word(bit);
 
-            d_pkt.append_bit_to_sync_word(bit_byte);
+            DEBUG_STREAM("getting sync word: 0x" << (int)d_pkt.sync_word << '\n');
+
             if(d_pkt.sync_word_identified()){
                 d_pkt.counter = 0;
-                d_state = getting_size_byte;
+                d_pkt.state = getting_size_byte;
                 DEBUG_STREAM(" ::: Finished getting sync word ::: " << std::endl);
             }else if(d_pkt.sync_word_timeout()){
-                clear_packet();
+                d_pkt.clear();
             }
             break;
 
         case getting_size_byte:
-            DEBUG_STREAM("getting size byte\n");
+            
+            d_pkt.append_bit_to_size_byte(bit);
 
-            d_pkt.append_bit_to_size_byte(bit_byte);
+            DEBUG_STREAM("getting size byte: 0x" << (int)d_pkt.size_byte << '\n');
+
             if(d_pkt.size_byte_identified()){
                 d_pkt.counter = 0;
-                d_state = getting_data;
-                DEBUG_STREAM(" ::: Finished getting size byte: " << std::to_string(d_pkt.size_byte) << " bytes expected ::: " << std::endl);
+                d_pkt.state = getting_data;
+                DEBUG_STREAM(std::dec);
+                DEBUG_STREAM(" ::: Finished getting size byte: " << (int)d_pkt.size_byte << " bytes expected ::: " << std::endl);
+                DEBUG_STREAM(std::hex);
             }
             break;
 
@@ -179,43 +143,63 @@ heron_rx_bb_impl::process_byte (uint8_t bit_byte)
 
             DEBUG_STREAM("getting data\n");
 
-            d_pkt.append_bit_to_data(bit_byte);
+            d_pkt.append_bit_to_data(bit);
             if(d_pkt.data_identified()){
                 d_pkt.counter = 0;
-                d_state = getting_checksum;
+                d_pkt.state = getting_checksum;
                 DEBUG_STREAM(" ::: Finished getting data ::: " << std::endl);
             }
             break;
 
         case getting_checksum:
         
-            DEBUG_STREAM("getting checksum\n");
 
-            d_pkt.append_bit_to_checksum(bit_byte);
+            d_pkt.append_bit_to_checksum(bit);
+
+            DEBUG_STREAM("getting checksum: " << d_pkt.checksum << '\n');
+
             if(d_pkt.checksum_identified()){
-                d_pkt.counter = 0;
-                d_state = finished_packet;
+
                 DEBUG_STREAM(" ::: Finished getting checksum ::: " << std::endl);
+
+                if(crc16(d_pkt.data, d_pkt.size_byte) == d_pkt.checksum){
+
+                    #ifdef DEBUG_FILE
+                    debug_file << "PACKET RECEIVED - VALID CHECKSUM\n";
+                    debug_file << "Packet length: " << std::to_string(d_pkt.size_byte) << std::endl;
+                    debug_file << "Packet contents (HEX): " << std::endl;
+                    for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
+                        debug_file << "0x" << std::setfill('0') << std::setw(2) << (int)d_pkt.data[j] << " ";
+                    }
+                    debug_file << std::endl;
+                    debug_file << "Packet contents (regular text): " << std::endl;
+                    for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
+                        debug_file << d_pkt.data[j] << " ";
+                    }
+                    debug_file << std::endl;
+                    debug_file << "================================" << std::endl;
+                    #endif
+
+                    d_pkt.counter = 0;
+                    d_pkt.state = finished_packet;
+                    d_pkt.data.push_back(0x0D); // append carriage return for ESTTC protocol
+
+                }else{
+                    DEBUG_STREAM("PACKET RECEIVED - INVALID CHECKSUM\n");
+                    d_pkt.clear();
+                }
             }
             break;
 
         default:
             DEBUG_STREAM("defaulted out\n");
 
-            clear_packet();
-            d_state = getting_preamble;
+            d_pkt.clear();
+            d_pkt.state = getting_preamble;
             break;
     }
 
 }
-
-void
-heron_rx_bb_impl::clear_packet(){
-    d_state = getting_preamble;
-    d_pkt.clear();
-    d_counter = 0;
-}
-
 uint16_t
 heron_rx_bb_impl::crc16(const std::deque<uint8_t> &data, uint8_t data_length)
 {
@@ -237,7 +221,7 @@ heron_rx_bb_impl::crc16(const std::deque<uint8_t> &data, uint8_t data_length)
     }
 
     /* calculate crc value for the rest of the datafields */
-    for(int i=0; i<data.size(); i++){
+    for(size_t i=0; i < data.size(); i++){
         data_byte = data[i];
         data_byte <<= 8;
         for(int i=0; i<8; i++) {
