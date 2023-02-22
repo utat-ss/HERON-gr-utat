@@ -14,6 +14,8 @@ include(GrPlatform) #define LIB_SUFFIX
 list(APPEND UTAT_HERON_sources
     heron_rx_bb_impl.cc
     heron_rx_bb_impl.h
+    heron_packet.cc
+    heron_packet.h
 )
 
 set(UTAT_HERON_sources "${UTAT_HERON_sources}" PARENT_SCOPE)

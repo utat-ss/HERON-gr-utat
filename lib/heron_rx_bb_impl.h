@@ -8,22 +8,21 @@
 #ifndef INCLUDED_UTAT_HERON_HERON_RX_BB_IMPL_H
 #define INCLUDED_UTAT_HERON_HERON_RX_BB_IMPL_H
 
+#include "heron_packet.h"
 #include <gnuradio/UTAT_HERON/heron_rx_bb.h>
 #include <string>
 #include <cstdint>
 #include <deque>
 #include <fstream>
 
+#ifdef DEBUG_FILE
+#define DEBUG_STREAM(x) debug_file << x
+#else
+#define DEBUG_STREAM(x)
+#endif
+
 namespace gr {
 namespace UTAT_HERON {
-
-typedef struct heron_packet_type {
-    uint32_t preamble;
-    uint8_t sync_word;
-    uint8_t size_byte;
-    std::deque<uint8_t> data;
-    uint16_t checksum;
-} heron_packet;
 
 enum rx_recog_state {
     getting_preamble,

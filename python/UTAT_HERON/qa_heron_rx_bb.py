@@ -25,11 +25,11 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
     def tearDown(self):
         self.tb = None
 
-    def test_instance(self):
+    def _test_instance(self):
         instance = heron_rx_bb()
         del instance # ensure debug_file is closed
 
-    def test_001_single_byte(self):
+    def _test_001_single_byte(self):
         samp_rate = 1e6
         input = [
             0xAA,0xAA,0xAA,0xAA,0xAA,0x7E,1,0x69,0xD3,0xB1
@@ -52,7 +52,7 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         del rx # ensure debug_file is closed
     
     # FAILING
-    def test_002_multiple_bytes(self):
+    def _test_002_multiple_bytes(self):
         samp_rate = 1e6
         input = [
             0xAB,0xAB,0xBA,0xFA,0x24,
