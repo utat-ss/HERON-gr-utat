@@ -17,7 +17,7 @@ set(CMAKE_BUILD_TYPE "Release" CACHE STRING "")
 cmake_minimum_required(VERSION 3.8)
 project(gr-UTAT_HERON
     LANGUAGES CXX C
-    VERSION 0.1.0
+    VERSION 2.0.0
     DESCRIPTION "GNURadio OutOfTree module for UTAT HERON Mk II"
     HOMEPAGE_URL "https://github.com/utat-ss/HERON-gr-utat"
 )
