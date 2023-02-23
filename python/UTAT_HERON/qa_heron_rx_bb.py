@@ -122,6 +122,5 @@ class qa_heron_rx_bb(gr_unittest.TestCase):
         output = dst.data()
         self.assertEqual(expected, output)
 
-
 if __name__ == '__main__':
     gr_unittest.run(qa_heron_rx_bb)

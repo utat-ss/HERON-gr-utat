@@ -16,9 +16,13 @@ list(APPEND UTAT_HERON_sources
     heron_rx_bb_impl.h
     heron_packet_manager.cc
     heron_packet_manager.h
+    heron_packet.h
     debug_logger.cc
     debug_logger.h
 )
+
+set(DEBUG_FILE "${CMAKE_BINARY_DIR}/debug_log.txt" CACHE FILEPATH
+"Log debug to this file when CMAKE_BULD_TYPE is Debug or RelWithDebInfo")
 
 set(UTAT_HERON_sources "${UTAT_HERON_sources}" PARENT_SCOPE)
 if(NOT UTAT_HERON_sources)
@@ -34,7 +38,7 @@ target_include_directories(gnuradio-UTAT_HERON
   )
 set_target_properties(gnuradio-UTAT_HERON PROPERTIES DEFINE_SYMBOL "gnuradio_UTAT_HERON_EXPORTS")
 target_compile_definitions(gnuradio-UTAT_HERON PUBLIC
-    $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG_FILE="${CMAKE_BINARY_DIR}/debug_log.txt">)
+    $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG_FILE="${DEBUG_FILE}">)
 
 if(APPLE)
     set_target_properties(gnuradio-UTAT_HERON PROPERTIES

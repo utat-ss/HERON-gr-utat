@@ -8,6 +8,7 @@
 #include "heron_rx_bb_impl.h"
 #include "debug_logger.h"
 #include <gnuradio/io_signature.h>
+#include <iostream>
 #include <iomanip>
 
 namespace gr {
@@ -31,10 +32,8 @@ heron_rx_bb_impl::heron_rx_bb_impl()
     debug_logger << "starting debug at time = " << std::time(0) << '\n';
     debug_logger << "running constructor\n";
     debug_logger << std::hex;
-    debug_logger << "running constructor, debug: " << DEBUG_FILE << '\n';
+    std::cout << "running constructor, debug: " << DEBUG_FILE << '\n';
     #endif
-
-    d_pkt.clear();
 }
 
 heron_rx_bb_impl::~heron_rx_bb_impl(){
@@ -50,7 +49,7 @@ void heron_rx_bb_impl::forecast(int noutput_items, gr_vector_int& ninput_items_r
     float packet_len = data_len + dec_per_packet;
     float npackets = noutput_items / (data_len+1); // add 1 for extra carrige return
 
-    ninput_items_required[0] = (int)(8*npackets*packet_len);
+    ninput_items_required[0] = static_cast<int>(8*npackets*packet_len);
 }
 
 int heron_rx_bb_impl::general_work(int noutput_items,
@@ -70,132 +69,27 @@ int heron_rx_bb_impl::general_work(int noutput_items,
 
     int ninput = 0; // number of bytes actually processed
     int noutput = 0; // number of bytes actually outputted
+    // NOTE: ninput is actually counting bits processed,
+    // since data coming into the block should be unpacked
+    // (every byte only carries a single bit)
 
-    auto fill_output_buf_if_available = [&](){
-        while(d_pkt.state == finished_packet && noutput < noutput_max){
-            out[noutput] = d_pkt.pop_data_if_avail();
+    auto fill_output_buf_if_able = [&](){
+        while(d_pkt.data_available() && noutput < noutput_max){
+            out[noutput] = d_pkt.pop_data();
             noutput++;
         }
     };
 
-    fill_output_buf_if_available();
+    fill_output_buf_if_able();
 
     while(ninput < ninput_max && noutput < noutput_max){
-        process_byte(in[ninput]);
+        d_pkt.process_bit(in[ninput]);
         ninput++;
-        fill_output_buf_if_available();
+        fill_output_buf_if_able();
     }
 
     consume_each(ninput);
     return noutput;
-
-}
-
-void
-heron_rx_bb_impl::process_byte (uint8_t bit)
-{
-
-    switch (d_pkt.state) {
-
-        case getting_preamble:
-
-            d_pkt.append_bit_to_preamble(bit);
-
-            DEBUG_STREAM("getting preamble: 0x" << d_pkt.preamble << '\n');
-
-            if (d_pkt.preamble_identified()) {
-                d_pkt.state = getting_sync_word;
-                DEBUG_STREAM(" ::: Finished getting preamble ::: " << std::endl);
-            }
-            break;
-
-        case getting_sync_word:
-
-            d_pkt.append_bit_to_sync_word(bit);
-
-            DEBUG_STREAM("getting sync word: 0x" << (int)d_pkt.sync_word << '\n');
-
-            if(d_pkt.sync_word_identified()){
-                d_pkt.counter = 0;
-                d_pkt.state = getting_size_byte;
-                DEBUG_STREAM(" ::: Finished getting sync word ::: " << std::endl);
-            }else if(d_pkt.sync_word_timeout()){
-                d_pkt.clear();
-            }
-            break;
-
-        case getting_size_byte:
-            
-            d_pkt.append_bit_to_size_byte(bit);
-
-            DEBUG_STREAM("getting size byte: 0x" << (int)d_pkt.size_byte << '\n');
-
-            if(d_pkt.size_byte_identified()){
-                d_pkt.counter = 0;
-                d_pkt.state = getting_data;
-                DEBUG_STREAM(std::dec);
-                DEBUG_STREAM(" ::: Finished getting size byte: " << (int)d_pkt.size_byte << " bytes expected ::: " << std::endl);
-                DEBUG_STREAM(std::hex);
-            }
-            break;
-
-        case getting_data:
-
-            DEBUG_STREAM("getting data\n");
-
-            d_pkt.append_bit_to_data(bit);
-            if(d_pkt.data_identified()){
-                d_pkt.counter = 0;
-                d_pkt.state = getting_checksum;
-                DEBUG_STREAM(" ::: Finished getting data ::: " << std::endl);
-            }
-            break;
-
-        case getting_checksum:
-        
-            d_pkt.append_bit_to_checksum(bit);
-
-            DEBUG_STREAM("getting checksum: " << d_pkt.checksum << '\n');
-
-            if(d_pkt.checksum_identified()){
-
-                DEBUG_STREAM(" ::: Finished getting checksum ::: " << std::endl);
-
-                if(d_pkt.checksum_matches()){
-                    #ifdef DEBUG_LOGGER
-                    debug_logger << "PACKET RECEIVED - VALID CHECKSUM\n";
-                    debug_logger << "Packet length: " << std::to_string(d_pkt.size_byte) << std::endl;
-                    debug_logger << "Packet contents (HEX): " << std::endl;
-                    for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                        debug_logger << "0x" << std::setfill('0') << std::setw(2) << (int)d_pkt.data[j] << " ";
-                    }
-                    debug_logger << std::endl;
-                    debug_logger << "Packet contents (regular text): " << std::endl;
-                    for (uint8_t j = 0; j < d_pkt.size_byte; j++) {
-                        debug_logger << d_pkt.data[j] << " ";
-                    }
-                    debug_logger << std::endl;
-                    debug_logger << "================================" << std::endl;
-                    #endif
-
-                    d_pkt.counter = 0;
-                    d_pkt.state = finished_packet;
-                    d_pkt.data.push_back(0x0D); // append carriage return for ESTTC protocol
-
-                }else{
-                    DEBUG_STREAM("PACKET RECEIVED - INVALID CHECKSUM\n");
-                    d_pkt.clear();
-                }
-            }
-            break;
-
-        default:
-            DEBUG_STREAM("defaulted out\n");
-
-            d_pkt.clear();
-            d_pkt.state = getting_preamble;
-            break;
-    }
 
 }
 

@@ -10,8 +10,6 @@
 
 #include "heron_packet_manager.h"
 #include <gnuradio/UTAT_HERON/heron_rx_bb.h>
-#include <string>
-#include <cstdint>
 #include <deque>
 
 namespace gr {
@@ -29,7 +27,6 @@ public:
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
                      gr_vector_void_star& output_items);
-    void process_byte(uint8_t bit_byte);
 };
 
 }
