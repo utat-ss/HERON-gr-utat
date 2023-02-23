@@ -4,6 +4,32 @@ A GNURadio out-of-tree module for the HERON Mk II ground station.
 
 The [ground-station](https://github.com/HeronMkII/ground-station) repository has some notes and instructions, but we are in the process of moving everything pertaining to this block to this repository.
 
+## Installation
+
+First clone (devel branch) and build using cmake
+```
+git clone https://github.com/utat-ss/HERON-gr-utat -b devel
+cd HERON-gr-utat
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build .
+```
+
+### ArchLinux
+
+continue running the following in the `build` directory after cmake
+```
+cpack -G TGZ
+makepkg -si
+```
+
+### Debian/Ubuntu
+
+```
+NOT YET AVAILABLE
+```
+
 ## Blocks
 
 ### heron_rx_bb
