@@ -7,6 +7,7 @@ The [ground-station](https://github.com/HeronMkII/ground-station) repository has
 ## Installation
 
 First clone (devel branch) and build using cmake
+
 ```
 git clone https://github.com/utat-ss/HERON-gr-utat -b devel
 cd HERON-gr-utat
@@ -16,18 +17,27 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build .
 ```
 
+Then, continue running the following in the `build` directory after cmake for your system
+
 ### ArchLinux
 
-continue running the following in the `build` directory after cmake
 ```
 cpack -G TGZ
 makepkg -si
 ```
 
-### Debian/Ubuntu
+### Debain Based
 
 ```
-NOT YET AVAILABLE
+cpack -G DEB
+sudo dpkg -i *.deb
+```
+
+### RPM Based
+
+```
+cpack -G RPM
+sudo rpm -i *.rmp
 ```
 
 ## Blocks

@@ -19,6 +19,7 @@ project(gr-UTAT_HERON
     LANGUAGES CXX C
     VERSION 0.1.0
     DESCRIPTION "GNURadio OutOfTree module for UTAT HERON Mk II"
+    HOMEPAGE_URL "https://github.com/utat-ss/HERON-gr-utat"
 )
 enable_testing()
 
@@ -157,5 +158,10 @@ configure_file(
     ${PROJECT_SOURCE_DIR}/cmake/PKGBUILD.in
     ${CMAKE_CURRENT_BINARY_DIR}/PKGBUILD
 @ONLY)
+
+set(CPACK_PACKAGE_CONTACT "Swarnava Ghosh <swarnavaghosh04@gmail.com>")
+set(CPACK_PACKAGE_VENDOR "University of Toronto Aerospace Team")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "gnuradio")
+set(CPACK_RPM_PACKAGE_REQUIRES "gnuradio")
 
 include(CPack)
