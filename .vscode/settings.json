@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "*.dox": "cpp",
-        "cstdint": "cpp"
-    }
-}
