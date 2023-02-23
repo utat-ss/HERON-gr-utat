@@ -15,7 +15,11 @@ set(CMAKE_BUILD_TYPE "Release" CACHE STRING "")
 # Project setup
 ########################################################################
 cmake_minimum_required(VERSION 3.8)
-project(gr-UTAT_HERON CXX C)
+project(gr-UTAT_HERON
+    LANGUAGES CXX C
+    VERSION 0.1.0
+    DESCRIPTION "GNURadio OutOfTree module for UTAT HERON Mk II"
+)
 enable_testing()
 
 # Install to PyBOMBS target prefix if defined
@@ -148,5 +152,10 @@ configure_package_config_file(
     ${CMAKE_CURRENT_BINARY_DIR}/cmake/Modules/${target}Config.cmake
     INSTALL_DESTINATION ${GR_CMAKE_DIR}
 )
+
+configure_file(
+    ${PROJECT_SOURCE_DIR}/cmake/PKGBUILD.in
+    ${CMAKE_CURRENT_BINARY_DIR}/PKGBUILD
+@ONLY)
 
 include(CPack)

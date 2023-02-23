@@ -1,0 +1,21 @@
+# Maintainer: Swarnava Ghosh <swarnavaghosh04@gmail.com>
+
+pkgname=@PROJECT_NAME@
+pkgver=@PROJECT_VERSION@
+pkgrel=1
+pkgdesc="@PROJECT_DESCRIPTION@"
+arch=('any')
+license=('GPL')
+depends=(gnuradio)
+source=("$pkgname-$pkgver-Linux.tar.gz")
+md5sums=('SKIP')
+url="https://github.com/utat-ss/HERON-gr-utat"
+build(){
+  cd "$srcdir"
+}
+package() {
+  cd "$srcdir"
+  tar -xf "$pkgname-$pkgver-Linux.tar.gz" -C "$pkgdir"
+  cd "$pkgdir"
+  mv "$pkgname-$pkgver-Linux" "usr"
+}
