@@ -22,7 +22,7 @@
 # Project setup
 ########################################################################
 cmake_minimum_required(VERSION 3.8)
-project(gr-utat CXX C)
+project(gr-utat CXX C VERSION 1.0.0)
 enable_testing()
 
 # Install to PyBOMBS target prefix if defined
