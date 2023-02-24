@@ -202,7 +202,8 @@ void heron_packet_manager::process_size_byte_bit(uint8_t bit){
     append_bit_to_size_byte(bit);
     debug_log_getting_size_byte();
     if(size_byte_identified()){
-        move_to_getting_data();
+        if(packet.size_byte == 0) move_to_getting_checksum();
+        else move_to_getting_data();
         debug_log_finished_size_byte();
     }
 }
@@ -254,7 +255,7 @@ void heron_packet_manager::debug_log_getting_data() const{
     DEBUG_STREAM("getting data\n");
 }
 void heron_packet_manager::debug_log_getting_checksum() const{
-    DEBUG_STREAM("getting checksum: " << packet.checksum << '\n');
+    DEBUG_STREAM("getting checksum: 0x" << packet.checksum << '\n');
 }
 
 void heron_packet_manager::debug_log_finished_preamble() const{
