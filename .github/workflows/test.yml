@@ -1,0 +1,46 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+      - devel
+  pull_request:
+    branches:
+      - master
+      - devel
+
+jobs:
+  ubuntu-test:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      
+    - name: Download Dependencies
+      run: |
+        sudo apt update
+        sudo apt install cmake gnuradio xvfb
+    - name: Configure CMake
+      run: |
+        mkdir build && cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+    - name: Build
+      run: cmake --build build
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest .
+    - name: Create Package
+      working-directory: ${{github.workspace}}/build
+      run: cpack -G DEB
+    - name: Install Package
+      working-directory: ${{github.workspace}}/build
+      run: sudo dpkg -i *.deb
+    - name: Test Installed Package
+      working-directory: ${{github.workspace}}/examples
+      run: |
+        grcc Heron_Receive.grc
+        xvfb-run --auto-servernum timeout --preserve-status 10s python3 Heron_Receive.py
