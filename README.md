@@ -19,13 +19,6 @@ cmake --build .
 
 Then, continue running the following in the `build` directory after cmake for your system
 
-### ArchLinux
-
-```
-cpack -G TGZ
-makepkg -si
-```
-
 ### Debain Based
 
 ```
@@ -38,6 +31,20 @@ sudo dpkg -i *.deb
 ```
 cpack -G RPM
 sudo rpm -i *.rmp
+```
+
+### ArchLinux
+
+```
+cpack -G TGZ
+makepkg -si
+```
+
+### MSYS2 (Windows)
+
+```
+cpack -G TGZ
+makepkg-mingw -si
 ```
 
 ## Blocks

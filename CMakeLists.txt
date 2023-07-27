@@ -154,14 +154,27 @@ configure_package_config_file(
     INSTALL_DESTINATION ${GR_CMAKE_DIR}
 )
 
-configure_file(
-    ${PROJECT_SOURCE_DIR}/cmake/PKGBUILD.in
-    ${CMAKE_CURRENT_BINARY_DIR}/PKGBUILD
-@ONLY)
+if(WIN32)
+	configure_file(
+	    ${PROJECT_SOURCE_DIR}/cmake/PKGBUILD-MSYS2.in
+	    ${CMAKE_CURRENT_BINARY_DIR}/PKGBUILD
+	@ONLY)
+    execute_process(
+        COMMAND sed -i 's/^M//' PKGBUILD # To get rid of CRLF error
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        OUTPUT_QUIET ERROR_QUIET
+        )
+else()
+	configure_file(
+	    ${PROJECT_SOURCE_DIR}/cmake/PKGBUILD-Archlinux.in
+	    ${CMAKE_CURRENT_BINARY_DIR}/PKGBUILD
+	@ONLY)
+endif()
 
 set(CPACK_PACKAGE_CONTACT "Swarnava Ghosh <swarnavaghosh04@gmail.com>")
 set(CPACK_PACKAGE_VENDOR "University of Toronto Aerospace Team")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "gnuradio")
 set(CPACK_RPM_PACKAGE_REQUIRES "gnuradio")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
 
 include(CPack)

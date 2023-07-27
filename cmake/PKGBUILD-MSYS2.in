@@ -1,0 +1,23 @@
+# Maintainer: Swarnava Ghosh <swarnavaghosh04@gmail.com>
+
+_realname=@PROJECT_NAME@
+pkgbase=mingw-w64-${_realname}
+pkgname=${MINGW_PACKAGE_PREFIX}-${_realname}
+pkgver=@PROJECT_VERSION@
+pkgrel=1
+pkgdesc="@PROJECT_DESCRIPTION@"
+arch=('any')
+license=('GPL')
+depends=("${MINGW_PACKAGE_PREFIX}-gnuradio")
+source=("$_realname-$pkgver.tar.gz")
+md5sums=('SKIP')
+url="https://github.com/utat-ss/HERON-gr-utat"
+build(){
+  cd "$srcdir"
+}
+package() {
+  cd "$srcdir"
+  tar -xf "$_realname-$pkgver.tar.gz" -C "$pkgdir"
+  cd "$pkgdir"
+  mv "$_realname-$pkgver" "./${MINGW_PREFIX}"
+}
