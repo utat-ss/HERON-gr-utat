@@ -22,6 +22,7 @@ namespace py = pybind11;
 /**************************************/
 // BINDING_FUNCTION_PROTOTYPES(
     void bind_heron_rx_bb(py::module& m);
+    void bind_header_format_esttc(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -43,6 +44,7 @@ PYBIND11_MODULE(UTAT_HERON_python, m)
 
     // Allow access to base block methods
     py::module::import("gnuradio.gr");
+    py::module::import("gnuradio.digital");
 
     /**************************************/
     // The following comment block is used for
@@ -51,5 +53,6 @@ PYBIND11_MODULE(UTAT_HERON_python, m)
     /**************************************/
     // BINDING_FUNCTION_CALLS(
     bind_heron_rx_bb(m);
+    bind_header_format_esttc(m);
     // ) END BINDING_FUNCTION_CALLS
 }

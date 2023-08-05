@@ -1,6 +1,7 @@
 id: UTAT_HERON_heron_rx_bb
 label: HERON RX BB
 category: '[UTAT]'
+flags: '[ deprecated ]'
 
 templates:
   imports: from gnuradio import UTAT_HERON

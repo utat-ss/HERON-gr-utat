@@ -19,6 +19,7 @@ list(APPEND UTAT_HERON_sources
     heron_packet.h
     debug_logger.cc
     debug_logger.h
+    header_format_esttc.cc
 )
 
 set(DEBUG_FILE "${CMAKE_BINARY_DIR}/debug_log.txt" CACHE FILEPATH
@@ -31,7 +32,7 @@ if(NOT UTAT_HERON_sources)
 endif(NOT UTAT_HERON_sources)
 
 add_library(gnuradio-UTAT_HERON SHARED ${UTAT_HERON_sources})
-target_link_libraries(gnuradio-UTAT_HERON gnuradio::gnuradio-runtime)
+target_link_libraries(gnuradio-UTAT_HERON gnuradio::gnuradio-runtime gnuradio::gnuradio-digital)
 target_include_directories(gnuradio-UTAT_HERON
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>
@@ -67,6 +68,7 @@ include(GrTest)
 #include_directories()
 # List all files that contain Boost.UTF unit tests here
 list(APPEND test_UTAT_HERON_sources
+qa_header_format_esttc.cc
 )
 # Anything we need to link to for the unit tests go here
 list(APPEND GR_TEST_TARGET_DEPS gnuradio-UTAT_HERON)
