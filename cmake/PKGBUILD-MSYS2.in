@@ -8,7 +8,9 @@ pkgrel=1
 pkgdesc="@PROJECT_DESCRIPTION@"
 arch=('any')
 license=('GPL')
-depends=("${MINGW_PACKAGE_PREFIX}-gnuradio")
+depends=(
+  "${MINGW_PACKAGE_PREFIX}-gnuradio"
+  "${MINGW_PACKAGE_PREFIX}-libsndfile")
 source=("$_realname-$pkgver.tar.gz")
 md5sums=('SKIP')
 url="https://github.com/utat-ss/HERON-gr-utat"

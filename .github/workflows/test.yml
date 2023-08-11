@@ -23,7 +23,7 @@ jobs:
     - name: Download Dependencies
       run: |
         sudo apt update
-        sudo apt install cmake gnuradio xvfb
+        sudo apt install cmake gnuradio xvfb libsndfile1-dev
     - name: Configure CMake
       run: |
         mkdir build && cd build

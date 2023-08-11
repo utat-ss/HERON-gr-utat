@@ -173,8 +173,8 @@ endif()
 
 set(CPACK_PACKAGE_CONTACT "Swarnava Ghosh <swarnavaghosh04@gmail.com>")
 set(CPACK_PACKAGE_VENDOR "University of Toronto Aerospace Team")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "gnuradio")
-set(CPACK_RPM_PACKAGE_REQUIRES "gnuradio")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "gnuradio, libsndfile1-dev")
+set(CPACK_RPM_PACKAGE_REQUIRES "gnuradio, libsndfile")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
 
 include(CPack)
