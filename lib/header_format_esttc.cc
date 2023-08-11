@@ -12,12 +12,13 @@
 namespace gr {
 namespace UTAT_HERON {
 
-header_format_esttc::sptr header_format_esttc::make(){
-    return header_format_esttc::sptr(new header_format_esttc());
+header_format_esttc::sptr header_format_esttc::make(const std::string& access_code, int threshold, int bps, int trailer_nbits){
+    return header_format_esttc::sptr(new header_format_esttc(access_code, threshold, bps, trailer_nbits));
 }
 
-header_format_esttc::header_format_esttc():
-    header_format_default("101010101010101010101010101010101010101001111110", 3, 1)
+header_format_esttc::header_format_esttc(const std::string& access_code, int threshold, int bps, int trailer_nbits):
+    header_format_default(access_code, threshold, bps),
+    d_trailer_nbits(trailer_nbits)
 {}
 
 header_format_esttc::~header_format_esttc() {}
@@ -44,6 +45,18 @@ bool header_format_esttc::format(int nbytes_in,
     return true;
 }
 
+bool header_format_esttc::parse(
+    int nbits_in,
+    const unsigned char* input,
+    std::vector<pmt::pmt_t>& info,
+    int& nbits_processed
+){
+    if(d_state == STATE_SYNC_SEARCH)
+        enter_have_sync();
+    
+    return header_format_default::parse(nbits_in, input, info, nbits_processed);
+}
+
 
 size_t header_format_esttc::header_nbits() const{
     return d_access_code_len + 8 * 1 * sizeof(uint8_t);
@@ -54,26 +67,27 @@ inline void header_format_esttc::enter_have_sync(){
     d_hdr_reg.clear();
 }
 inline void header_format_esttc::enter_have_header(int payload_len){
-    d_state = STATE_SYNC_SEARCH;
+    enter_search();
     d_pkt_len = payload_len;
     d_pkt_count = 0;
 }
 inline void header_format_esttc::enter_search(){
-    d_state = STATE_SYNC_SEARCH;
+    enter_have_sync();
 }
 
 bool header_format_esttc::header_ok(){
-    return d_hdr_reg.length() == 8 * 1 * sizeof(uint8_t);
+    bool ret = d_hdr_reg.length() == 8 * 1 * sizeof(uint8_t);
+    return ret;
 }
 
 int header_format_esttc::header_payload(){
     
-    uint8_t len = d_hdr_reg.extract_field16(0, 8);
+    uint8_t len = d_hdr_reg.extract_field8(0, 8);
 
     d_info = pmt::make_dict();
     d_info = pmt::dict_add(
-        d_info, pmt::intern("payload symbols"), pmt::from_long(8 * len / d_bps));
-    return static_cast<int>(len);
+        d_info, pmt::intern("payload symbols"), pmt::from_long((8 * len + d_trailer_nbits) / d_bps));
+    return static_cast<int>(len + std::ceil(d_trailer_nbits/8.0));
 }
 
 } /* namespace UTAT_HERON */

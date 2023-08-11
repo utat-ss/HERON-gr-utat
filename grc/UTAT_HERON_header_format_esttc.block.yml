@@ -3,16 +3,38 @@ label: ESTTC Header Format
 category: '[UTAT]'
 flags: [ show_id, python, cpp ]
 
-value: ${ UTAT_HERON.header_format_esttc() }
+parameters:
+- id: access_code
+  label: Access Code
+  dtype: string
+  default: '"101010111"'
+- id: threshold
+  label: Threshold
+  dtype: int
+  default: 0
+- id: bps
+  label: Payload Bits per Symbol
+  dtype: int
+  default: 1
+- id: trailer_nbits
+  label: Trailer Bits
+  dtype: int
+  default: 0
+
+value: ${ UTAT_HERON.header_format_esttc(access_code, threshold, bps, trailer_nbits) }
 
 templates:
   imports: from gnuradio import UTAT_HERON
-  var_make: self.${id} = ${id} = UTAT_HERON.header_format_esttc()
+  var_make: |-
+    self.${id} = ${id} = UTAT_HERON.header_format_esttc(${access_code},\
+    ${threshold}, ${bps}, ${trailer_nbits})
 
 cpp_templates:
   includes: ['#include <gnuradio/UTAT_HERON/header_format_esttc.h>']
   declarations: 'UTAT_HERON::header_format_esttc::sptr ${id};'
-  var_make: this->${id} = ${id} = UTAT_HERON::header_format_esttc();
+  var_make: |-
+    this->${id} = ${id} = UTAT_HERON::header_format_esttc(${access_code},\
+    ${threshold}, ${bps}, ${trailer_nbits});
   link: ['gnuradio::gnuradio-digital']
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.

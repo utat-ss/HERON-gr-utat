@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(header_format_esttc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(41bda5cf854f7a82ab2d53b92e58e7f5)                     */
+/* BINDTOOL_HEADER_FILE_HASH(4debf424b7f86e2767073c5f2884768e)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -36,12 +36,21 @@ void bind_header_format_esttc(py::module& m)
     py::class_<header_format_esttc, gr::digital::header_format_default,
         std::shared_ptr<header_format_esttc>>(m, "header_format_esttc", D(header_format_esttc))
 
-        .def(py::init(&header_format_esttc::make),
-           D(header_format_esttc,make)
+        .def(
+            py::init(&header_format_esttc::make),
+            py::arg("access_code"),
+            py::arg("threshold"),
+            py::arg("bps") = 1,
+            py::arg("trailer_nbits") = 0,
+            D(header_format_esttc,make)
         )
         .def_static(
             "make",
             &header_format_esttc::make,
+            py::arg("access_code"),
+            py::arg("threshold"),
+            py::arg("bps") = 1,
+            py::arg("trailer_nbits") = 0,
             D(header_format_esttc,make)
         )
         .def(
@@ -52,6 +61,14 @@ void bind_header_format_esttc(py::module& m)
             py::arg("output"),
             py::arg("info"),
             D(header_format_esttc, format))
+        .def(
+            "parse",
+            &header_format_esttc::parse,
+            py::arg("nbits_in"),
+            py::arg("input"),
+            py::arg("info"),
+            py::arg("nbits_processed"),
+            D(header_format_esttc, parse))
         .def(
             "header_nbits",
             &header_format_esttc::header_nbits,
