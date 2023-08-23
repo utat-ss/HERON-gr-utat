@@ -40,3 +40,4 @@ add_custom_target(
           ${PROJECT_BINARY_DIR}/test_modules/gnuradio/UTAT_HERON/
 )
 GR_ADD_TEST(qa_heron_rx_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_heron_rx_bb.py)
+GR_ADD_TEST(qa_esttc_framer ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_esttc_framer.py)

@@ -1,3 +1,16 @@
+# v2.1.0
+
+## Highlights
+
+- Introduced `ESTTC Header Format` block
+- Introduced `ESTTC framer` block
+- Marked `HERON RX BB` as deprecated
+
+## Features
+
+- `ESTTC Header Format` is the first step in a new method of deframing ESTTC frames. The hope is to utilize GNURadio's inbuilt digital modules to do most of the dirty work. This will make the code much more readable and maintainable in addition to being smaller.
+- `ESTTC Framer` is what utilizes the `ESTTC Header Format` object to wrap messages (specifically PDU's) in an ESTTC packet.
+
 # v2.0.0
 
 ## Highlights

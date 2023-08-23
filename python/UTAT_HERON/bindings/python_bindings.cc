@@ -23,6 +23,7 @@ namespace py = pybind11;
 // BINDING_FUNCTION_PROTOTYPES(
     void bind_heron_rx_bb(py::module& m);
     void bind_header_format_esttc(py::module& m);
+    void bind_esttc_framer(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -54,5 +55,6 @@ PYBIND11_MODULE(UTAT_HERON_python, m)
     // BINDING_FUNCTION_CALLS(
     bind_heron_rx_bb(m);
     bind_header_format_esttc(m);
+    bind_esttc_framer(m);
     // ) END BINDING_FUNCTION_CALLS
 }

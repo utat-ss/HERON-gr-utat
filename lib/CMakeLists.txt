@@ -20,6 +20,7 @@ list(APPEND UTAT_HERON_sources
     debug_logger.cc
     debug_logger.h
     header_format_esttc.cc
+    esttc_framer_impl.cc
 )
 
 set(DEBUG_FILE "${CMAKE_BINARY_DIR}/debug_log.txt" CACHE FILEPATH
@@ -32,7 +33,10 @@ if(NOT UTAT_HERON_sources)
 endif(NOT UTAT_HERON_sources)
 
 add_library(gnuradio-UTAT_HERON SHARED ${UTAT_HERON_sources})
-target_link_libraries(gnuradio-UTAT_HERON gnuradio::gnuradio-runtime gnuradio::gnuradio-digital)
+target_link_libraries(gnuradio-UTAT_HERON
+    gnuradio::gnuradio-runtime
+    gnuradio::gnuradio-digital
+    gnuradio::gnuradio-pdu)
 target_include_directories(gnuradio-UTAT_HERON
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>
