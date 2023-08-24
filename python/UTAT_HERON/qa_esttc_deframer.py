@@ -29,9 +29,9 @@ class qa_esttc_deframer(gr_unittest.TestCase):
     def test_instance(self):
         instance = esttc_deframer(1e6)
 
-    def test_001_descriptive_test_name(self):
+    def test_001_basic(self):
         input = [0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0x7e, 0x02, 0xff, 0xff, 0xbf, 0xf3]
-        expected_output = [0x02, 0xff, 0xff]
+        expected_output = [0xff, 0xff]
 
         src = blocks.vector_source_b(input, False, 1, [])
         unpack = blocks.unpack_k_bits_bb(8)

@@ -71,6 +71,51 @@ public:
     }
 };
 
+class strip_prepended_length : public gr::sync_block{
+private:
+    void handle_msg(const pmt::pmt_t& pdu){
+        auto data = pmt::u8vector_elements(pmt::cdr(pdu));
+        auto start = data.begin();
+        auto end = data.end();
+        data = std::vector<uint8_t>(start+1, end);
+        auto new_cdr = pmt::init_u8vector(data.size(), data);
+        auto new_pdu = pmt::cons(pmt::car(pdu), new_cdr);
+        message_port_pub(pmt::intern("pdu_out"), new_pdu);
+    }
+public:
+
+    strip_prepended_length():
+        gr::sync_block(
+            "strip_prepended_length",
+            gr::io_signature::make(0,0,0),
+            gr::io_signature::make(0,0,0)
+        )
+    {
+        message_port_register_in(pmt::intern("pdu_in"));
+        message_port_register_out(pmt::intern("pdu_out"));
+
+        set_msg_handler(pmt::intern("pdu_in"), [this](const pmt::pmt_t& pdu){
+            this->handle_msg(pdu);
+        });
+    }
+
+    int work(
+        int noutput_items,
+        gr_vector_const_void_star& input_items,
+        gr_vector_void_star& output_items
+    ) override
+    {
+        return 0;
+    }
+
+    typedef std::shared_ptr<strip_prepended_length> sptr;
+    
+    static sptr make(){
+        return gnuradio::make_block_sptr<strip_prepended_length>();
+    }
+
+};
+
 
 /*
  * The private constructor
@@ -95,6 +140,7 @@ esttc_deframer_impl::esttc_deframer_impl(float samp_rate)
     auto stream_to_pdu = gr::pdu::tagged_stream_to_pdu::make(gr::types::byte_t, "payload symbols");
     auto prepend_length = prepend_length::make(2);
     auto crc = gr::digital::crc_check::make(16, 0x1021, 0xFFFF, 0x0000, false, false, false, true, 0);
+    auto strip_prepended_len = strip_prepended_length::make();
 
     connect(self(), 0, find_access_code, 0);
     connect(find_access_code, 0, hdr_payload_demux, 0);
@@ -105,8 +151,9 @@ esttc_deframer_impl::esttc_deframer_impl(float samp_rate)
     connect(scale_length, 0, stream_to_pdu, 0);
     msg_connect(stream_to_pdu, "pdus", prepend_length, "pdu_in");
     msg_connect(prepend_length, "pdu_out", crc, "in");
-    msg_connect(crc, "ok", self(), "crc_ok");
+    msg_connect(crc, "ok", strip_prepended_len, "pdu_in");
     msg_connect(crc, "fail", self(), "crc_fail");
+    msg_connect(strip_prepended_len, "pdu_out", self(), "crc_ok");
 
 }
 
