@@ -8,7 +8,7 @@
 #ifndef INCLUDED_UTAT_HERON_HERON_RX_BB_IMPL_H
 #define INCLUDED_UTAT_HERON_HERON_RX_BB_IMPL_H
 
-#include "heron_packet_manager.h"
+#include "utils/heron_packet_manager.h"
 #include <gnuradio/UTAT_HERON/heron_rx_bb.h>
 #include <deque>
 
