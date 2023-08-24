@@ -13,8 +13,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(esttc_framer.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(a046fc89b6cb355e0d62a366431e8fef)                     */
+/* BINDTOOL_HEADER_FILE(esttc_deframer.h)                                        */
+/* BINDTOOL_HEADER_FILE_HASH(cf137220b3a85c58873b8d67da5e1cfc)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -23,21 +23,23 @@
 
 namespace py = pybind11;
 
-#include <gnuradio/UTAT_HERON/esttc_framer.h>
+#include <gnuradio/UTAT_HERON/esttc_deframer.h>
 // pydoc.h is automatically generated in the build directory
-#include <esttc_framer_pydoc.h>
+#include <esttc_deframer_pydoc.h>
 
-void bind_esttc_framer(py::module& m)
+void bind_esttc_deframer(py::module& m)
 {
 
-    using esttc_framer = gr::UTAT_HERON::esttc_framer;
+    using esttc_deframer = gr::UTAT_HERON::esttc_deframer;
 
 
-    py::class_<esttc_framer,
+    py::class_<esttc_deframer,
                gr::hier_block2,
-               std::shared_ptr<esttc_framer>>(m, "esttc_framer", D(esttc_framer))
+               std::shared_ptr<esttc_deframer>>(m, "esttc_deframer", D(esttc_deframer))
 
-        .def(py::init(&esttc_framer::make), D(esttc_framer, make))
+        .def(py::init(&esttc_deframer::make),
+             py::arg("samp_rate"),
+             D(esttc_deframer, make))
 
 
         ;

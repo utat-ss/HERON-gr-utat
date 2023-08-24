@@ -13,5 +13,6 @@ install(FILES
     api.h
     heron_rx_bb.h
     header_format_esttc.h
-    esttc_framer.h DESTINATION include/gnuradio/UTAT_HERON
+    esttc_framer.h
+    esttc_deframer.h DESTINATION include/gnuradio/UTAT_HERON
 )

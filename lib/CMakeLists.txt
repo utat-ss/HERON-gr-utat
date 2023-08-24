@@ -21,6 +21,7 @@ list(APPEND UTAT_HERON_sources
     debug_logger.h
     header_format_esttc.cc
     esttc_framer_impl.cc
+    esttc_deframer_impl.cc
 )
 
 set(DEBUG_FILE "${CMAKE_BINARY_DIR}/debug_log.txt" CACHE FILEPATH

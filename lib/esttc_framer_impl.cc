@@ -19,10 +19,6 @@
 namespace gr {
 namespace UTAT_HERON {
 
-#pragma message("set the following appropriately and remove this warning")
-using input_type = float;
-#pragma message("set the following appropriately and remove this warning")
-using output_type = float;
 esttc_framer::sptr esttc_framer::make()
 {
     return gnuradio::make_block_sptr<esttc_framer_impl>();

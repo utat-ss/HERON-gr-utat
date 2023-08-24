@@ -9,5 +9,6 @@
 install(FILES
     UTAT_HERON_heron_rx_bb.block.yml
     UTAT_HERON_header_format_esttc.block.yml
-    UTAT_HERON_esttc_framer.block.yml DESTINATION share/gnuradio/grc/blocks
+    UTAT_HERON_esttc_framer.block.yml
+    UTAT_HERON_esttc_deframer.block.yml DESTINATION share/gnuradio/grc/blocks
 )

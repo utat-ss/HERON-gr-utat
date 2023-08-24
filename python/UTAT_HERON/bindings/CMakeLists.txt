@@ -31,7 +31,8 @@ include(GrPybind)
 list(APPEND UTAT_HERON_python_files
     heron_rx_bb_python.cc
     header_format_esttc_python.cc
-    esttc_framer_python.cc python_bindings.cc)
+    esttc_framer_python.cc
+    esttc_deframer_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(UTAT_HERON
    ../../..
