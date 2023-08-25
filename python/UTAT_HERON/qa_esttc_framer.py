@@ -6,7 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-
 import pmt
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks, pdu
@@ -39,7 +38,7 @@ class qa_esttc_framer(gr_unittest.TestCase):
         tag = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, len(input), 'packet_len')
         to_pdu = pdu.tagged_stream_to_pdu(gr.types.byte_t, 'packet_len')
         framer = esttc_framer()
-        msg_debug = blocks.message_debug(True, gr.log_levels.info)
+        msg_debug = blocks.message_debug()
 
         self.tb.connect(src, tag)
         self.tb.connect(tag, to_pdu)

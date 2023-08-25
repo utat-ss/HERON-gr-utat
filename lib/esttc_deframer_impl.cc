@@ -6,6 +6,8 @@
  */
 
 #include "esttc_deframer_impl.h"
+#include "utils/pdu_lambda.h"
+#include "utils/common.h"
 #include <gnuradio/io_signature.h>
 
 #include <gnuradio/UTAT_HERON/header_format_esttc.h>
@@ -25,96 +27,23 @@ esttc_deframer::sptr esttc_deframer::make(float samp_rate)
     return gnuradio::make_block_sptr<esttc_deframer_impl>(samp_rate);
 }
 
-class prepend_length : public gr::sync_block{
+void prepend_len_minus_crc_bytes(pmt::pmt_t pdu){
+    auto data = pmt::u8vector_elements(pmt::cdr(pdu));
+    auto start = data.begin();
+    uint8_t crc_nbytes = utils::crc::num_bits/8;
+    data.insert(start, data.size()-crc_nbytes);
+    auto new_cdr = pmt::init_u8vector(data.size(), data);
+    pmt::set_cdr(pdu, new_cdr);
+}
 
-private:
-    int skip_bytes;
-    void handle_msg(const pmt::pmt_t& pdu){
-        auto data = pmt::u8vector_elements(pmt::cdr(pdu));
-        auto start = data.begin();
-        data.insert(start, data.size()-skip_bytes);
-        auto new_cdr = pmt::init_u8vector(data.size(), data);
-        auto new_pdu = pmt::cons(pmt::car(pdu), new_cdr);
-        message_port_pub(pmt::intern("pdu_out"), new_pdu);
-    }
-public:
-
-    prepend_length(int skip_bytes=0):
-        gr::sync_block(
-            "prepend_length",
-            gr::io_signature::make(0,0,0),
-            gr::io_signature::make(0,0,0)
-        ),
-        skip_bytes(skip_bytes)
-    {
-        message_port_register_in(pmt::intern("pdu_in"));
-        message_port_register_out(pmt::intern("pdu_out"));
-
-        set_msg_handler(pmt::intern("pdu_in"), [this](const pmt::pmt_t& pdu){
-            this->handle_msg(pdu);
-        });
-    }
-
-    int work(
-        int noutput_items,
-        gr_vector_const_void_star& input_items,
-        gr_vector_void_star& output_items
-    ) override
-    {
-        return 0;
-    }
-
-    typedef std::shared_ptr<prepend_length> sptr;
-    
-    static sptr make(int skip_bytes=0){
-        return gnuradio::make_block_sptr<prepend_length>(skip_bytes);
-    }
-};
-
-class strip_prepended_length : public gr::sync_block{
-private:
-    void handle_msg(const pmt::pmt_t& pdu){
-        auto data = pmt::u8vector_elements(pmt::cdr(pdu));
-        auto start = data.begin();
-        auto end = data.end();
-        data = std::vector<uint8_t>(start+1, end);
-        auto new_cdr = pmt::init_u8vector(data.size(), data);
-        auto new_pdu = pmt::cons(pmt::car(pdu), new_cdr);
-        message_port_pub(pmt::intern("pdu_out"), new_pdu);
-    }
-public:
-
-    strip_prepended_length():
-        gr::sync_block(
-            "strip_prepended_length",
-            gr::io_signature::make(0,0,0),
-            gr::io_signature::make(0,0,0)
-        )
-    {
-        message_port_register_in(pmt::intern("pdu_in"));
-        message_port_register_out(pmt::intern("pdu_out"));
-
-        set_msg_handler(pmt::intern("pdu_in"), [this](const pmt::pmt_t& pdu){
-            this->handle_msg(pdu);
-        });
-    }
-
-    int work(
-        int noutput_items,
-        gr_vector_const_void_star& input_items,
-        gr_vector_void_star& output_items
-    ) override
-    {
-        return 0;
-    }
-
-    typedef std::shared_ptr<strip_prepended_length> sptr;
-    
-    static sptr make(){
-        return gnuradio::make_block_sptr<strip_prepended_length>();
-    }
-
-};
+void strip_prepended_len(pmt::pmt_t pdu){
+    auto data = pmt::u8vector_elements(pmt::cdr(pdu));
+    auto start = data.begin();
+    auto end = data.end();
+    data = std::vector<uint8_t>(start+1, end);
+    auto new_cdr = pmt::init_u8vector(data.size(), data.data());
+    pmt::set_cdr(pdu, new_cdr);
+}
 
 
 /*
@@ -126,21 +55,28 @@ esttc_deframer_impl::esttc_deframer_impl(float samp_rate)
                       gr::io_signature::make(0, 0, 0))
 {
 
-    message_port_register_hier_out(pmt::intern("crc_ok"));
-    message_port_register_hier_out(pmt::intern("crc_fail"));
+    message_port_register_hier_out(pmt::mp("crc_ok"));
+    message_port_register_hier_out(pmt::mp("crc_fail"));
 
-    auto access_code = "101010101010101010101010101010101010101001111110";
-
-    auto hdr_format = UTAT_HERON::header_format_esttc::make(access_code, 3, 1, 16);
-    auto find_access_code = gr::digital::correlate_access_code_tag_bb::make(&access_code[8], 0, "time_est");
-    auto hdr_payload_demux = gr::digital::header_payload_demux::make(8, 1, 0, "payload symbols", "time_est", false, sizeof(uint8_t), "rx_time", samp_rate);
+    auto hdr_format = UTAT_HERON::header_format_esttc::make(utils::access_code, 3, 1, utils::crc::num_bits);
+    auto find_access_code = gr::digital::correlate_access_code_tag_bb::make(utils::trimmed_access_code, 0, "time_est");
+    auto hdr_payload_demux = gr::digital::header_payload_demux::make(
+        hdr_format->header_nbits_without_access_code(),
+        1, 0, "payload symbols", "time_est", false, sizeof(uint8_t), "", samp_rate);
     auto parser = gr::digital::protocol_parser_b::make(hdr_format);
     auto pack_bits = gr::blocks::repack_bits_bb::make(1, 8, "", false, gr::GR_MSB_FIRST);
     auto scale_length = gr::blocks::tagged_stream_multiply_length::make(sizeof(uint8_t), "payload symbols", 1./8);
     auto stream_to_pdu = gr::pdu::tagged_stream_to_pdu::make(gr::types::byte_t, "payload symbols");
-    auto prepend_length = prepend_length::make(2);
-    auto crc = gr::digital::crc_check::make(16, 0x1021, 0xFFFF, 0x0000, false, false, false, true, 0);
-    auto strip_prepended_len = strip_prepended_length::make();
+    auto prepend_length = utils::pdu_lambda::make(prepend_len_minus_crc_bytes);
+    auto crc = gr::digital::crc_check::make(
+        utils::crc::num_bits,
+        utils::crc::poly,
+        utils::crc::inital_value,
+        utils::crc::final_xor,
+        utils::crc::input_reflected,
+        utils::crc::result_reflected,
+        false, true, 0);
+    auto strip_prepended_length = utils::pdu_lambda::make(strip_prepended_len);
 
     connect(self(), 0, find_access_code, 0);
     connect(find_access_code, 0, hdr_payload_demux, 0);
@@ -151,10 +87,14 @@ esttc_deframer_impl::esttc_deframer_impl(float samp_rate)
     connect(scale_length, 0, stream_to_pdu, 0);
     msg_connect(stream_to_pdu, "pdus", prepend_length, "pdu_in");
     msg_connect(prepend_length, "pdu_out", crc, "in");
-    msg_connect(crc, "ok", strip_prepended_len, "pdu_in");
+    msg_connect(crc, "ok", strip_prepended_length, "pdu_in");
     msg_connect(crc, "fail", self(), "crc_fail");
-    msg_connect(strip_prepended_len, "pdu_out", self(), "crc_ok");
+    msg_connect(strip_prepended_length, "pdu_out", self(), "crc_ok");
 
+    // msg_connect(stream_to_pdu, "pdus", crc, "in");
+    // msg_connect(crc, "ok", self(), "crc_ok");
+    // msg_connect(crc, "fail", self(), "crc_fail");
+    
 }
 
 /*

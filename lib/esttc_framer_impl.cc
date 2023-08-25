@@ -6,6 +6,7 @@
  */
 
 #include "esttc_framer_impl.h"
+#include "utils/common.h"
 #include <gnuradio/io_signature.h>
 
 #include <gnuradio/UTAT_HERON/header_format_esttc.h>
@@ -33,18 +34,23 @@ esttc_framer_impl::esttc_framer_impl()
                       gr::io_signature::make(0,0,0),
                       gr::io_signature::make(0,0,0))
 {
-    message_port_register_hier_in(pmt::intern("pdu_in"));
-    message_port_register_hier_out(pmt::intern("pdu_out"));
+    message_port_register_hier_in(pmt::mp("pdu_in"));
+    message_port_register_hier_out(pmt::mp("pdu_out"));
 
-    auto access_code = "101010101010101010101010101010101010101001111110";
-
-    auto hdr_format = UTAT_HERON::header_format_esttc::make(access_code, 3, 1, 16);
+    auto hdr_format = UTAT_HERON::header_format_esttc::make(utils::access_code, 3, 1, utils::crc::num_bits);
     auto formatter = gr::digital::protocol_formatter_async::make(hdr_format);
     auto header_stream = gr::pdu::pdu_to_tagged_stream::make(gr::types::byte_t, "packet_len");
     auto payload_stream = gr::pdu::pdu_to_tagged_stream::make(gr::types::byte_t, "packet_len");
     auto combine = gr::blocks::tagged_stream_mux::make(1, "packet_len");
     auto stream_to_pdu = gr::pdu::tagged_stream_to_pdu::make(gr::types::byte_t, "packet_len");
-    auto crc = gr::digital::crc_append::make(16, 0x1021, 0xFFFF, 0x0000, false, false, false, 6);
+    auto crc = gr::digital::crc_append::make(
+        utils::crc::num_bits,
+        utils::crc::poly,
+        utils::crc::inital_value,
+        utils::crc::final_xor,
+        utils::crc::input_reflected,
+        utils::crc::result_reflected,
+        false, 6);
 
     msg_connect(self(), "pdu_in", formatter, "in");
     msg_connect(formatter, "header", header_stream, "pdus");

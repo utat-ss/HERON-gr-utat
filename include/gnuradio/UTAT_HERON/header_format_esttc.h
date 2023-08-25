@@ -36,6 +36,7 @@ public:
         std::vector<pmt::pmt_t>& info,
         int& nbits_processed) override;
     size_t header_nbits() const override;
+    size_t header_nbits_without_access_code() const;
 protected:
     int d_trailer_nbits;
     void enter_have_sync() override;

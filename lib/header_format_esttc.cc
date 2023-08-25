@@ -59,7 +59,11 @@ bool header_format_esttc::parse(
 
 
 size_t header_format_esttc::header_nbits() const{
-    return d_access_code_len + 8 * 1 * sizeof(uint8_t);
+    return d_access_code_len + header_nbits_without_access_code();
+}
+
+size_t header_format_esttc::header_nbits_without_access_code() const{
+    return 8 * 1 * sizeof(uint8_t);
 }
 
 inline void header_format_esttc::enter_have_sync(){
