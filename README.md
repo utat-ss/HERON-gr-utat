@@ -36,14 +36,12 @@ sudo rpm -i *.rmp
 ### ArchLinux
 
 ```
-cpack -G TGZ
 makepkg -si
 ```
 
 ### MSYS2 (Windows)
 
 ```
-cpack -G TGZ
 makepkg-mingw -si
 ```
 

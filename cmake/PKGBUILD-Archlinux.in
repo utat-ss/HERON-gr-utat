@@ -7,15 +7,15 @@ pkgdesc="@PROJECT_DESCRIPTION@"
 arch=('any')
 license=('GPL')
 depends=('gnuradio' 'libsndfile')
-source=("$pkgname-$pkgver.tar.gz")
-md5sums=('SKIP')
+source=()
+md5sums=()
 url="https://github.com/utat-ss/HERON-gr-utat"
 build(){
-  cd "$srcdir"
+  cd ..
+  cmake .. -DCMAKE_INSTALL_PREFIX="/usr"
+  cmake --build .
 }
 package() {
-  cd "$srcdir"
-  tar -xf "$pkgname-$pkgver.tar.gz" -C "$pkgdir"
-  cd "$pkgdir"
-  mv "$pkgname-$pkgver" "usr"
+  cd ..
+  DESTDIR="$pkgdir" cmake --install .
 }

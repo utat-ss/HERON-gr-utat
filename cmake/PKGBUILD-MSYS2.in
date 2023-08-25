@@ -15,11 +15,12 @@ source=("$_realname-$pkgver.tar.gz")
 md5sums=('SKIP')
 url="https://github.com/utat-ss/HERON-gr-utat"
 build(){
-  cd "$srcdir"
+  cd ..
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+  cmake .. -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX}
+  cmake --build .
 }
 package() {
-  cd "$srcdir"
-  tar -xf "$_realname-$pkgver.tar.gz" -C "$pkgdir"
-  cd "$pkgdir"
-  mv "$_realname-$pkgver" "./${MINGW_PREFIX}"
+  cd ..
+  DESTDIR="$pkgdir" cmake --install .
 }
