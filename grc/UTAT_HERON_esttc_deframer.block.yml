@@ -37,9 +37,11 @@ outputs:
 - label: crc_ok
   domain: message
   dtype: message
+  optional: 1
 - label: crc_fail
   domain: message
   dtype: message
+  optional: 1
 
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.
