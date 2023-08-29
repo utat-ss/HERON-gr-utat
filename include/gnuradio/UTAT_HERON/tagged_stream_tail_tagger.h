@@ -33,7 +33,7 @@ public:
      * class. UTAT_HERON::tagged_stream_tail_tagger::make is the public interface for
      * creating new instances.
      */
-    static sptr make(const std::string& length_tag_key, const std::string& tail_tag_key);
+    static sptr make(const std::string& length_tag_key = "packet_len", const std::string& tail_tag_key = "trailer");
 };
 
 } // namespace UTAT_HERON

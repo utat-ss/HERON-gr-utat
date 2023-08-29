@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(tagged_stream_tail_tagger.h) */
-/* BINDTOOL_HEADER_FILE_HASH(a544000c6ef5c511ea9a95c65ec60c94)                     */
+/* BINDTOOL_HEADER_FILE_HASH(1a18d8b8942924c053aa80b1485453d3)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -40,8 +40,8 @@ void bind_tagged_stream_tail_tagger(py::module& m)
         m, "tagged_stream_tail_tagger", D(tagged_stream_tail_tagger))
 
         .def(py::init(&tagged_stream_tail_tagger::make),
-             py::arg("length_tag_key"),
-             py::arg("tail_tag_key"),
+             py::arg("length_tag_key") = "packet_len",
+             py::arg("tail_tag_key") = "trailer",
              D(tagged_stream_tail_tagger, make))
 
 
