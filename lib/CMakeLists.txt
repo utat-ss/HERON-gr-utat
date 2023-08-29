@@ -10,7 +10,6 @@
 # Setup library
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
-
 list(APPEND UTAT_HERON_sources
     utils/heron_packet_manager.cc
     utils/heron_packet_manager.h
@@ -26,7 +25,7 @@ list(APPEND UTAT_HERON_sources
     header_format_esttc.cc
     esttc_framer_impl.cc
     esttc_deframer_impl.cc
-)
+    tagged_stream_tail_tagger_impl.cc )
 
 set(DEBUG_FILE "${CMAKE_BINARY_DIR}/debug_log.txt" CACHE FILEPATH
 "Log debug to this file when CMAKE_BULD_TYPE is Debug or RelWithDebInfo")

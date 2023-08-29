@@ -42,3 +42,4 @@ add_custom_target(
 GR_ADD_TEST(qa_heron_rx_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_heron_rx_bb.py)
 GR_ADD_TEST(qa_esttc_framer ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_esttc_framer.py)
 GR_ADD_TEST(qa_esttc_deframer ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_esttc_deframer.py)
+GR_ADD_TEST(qa_tagged_stream_tail_tagger ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_tagged_stream_tail_tagger.py)
