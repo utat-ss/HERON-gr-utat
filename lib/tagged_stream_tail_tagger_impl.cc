@@ -45,7 +45,7 @@ void tagged_stream_tail_tagger_impl::forecast(
     gr_vector_int& ninput_items_required)
 {
     ninput_items_required[0] = noutput_items;
-    if(d_state == STATE_PACKET)
+    if(d_state == STATE_PACKET || d_state == STATE_TRAILER)
         ninput_items_required[0]++;
 }
 
@@ -118,16 +118,6 @@ int tagged_stream_tail_tagger_impl::general_work(
         add_item_tag(0, nitems_written(0) + nproduced, d_tailtag, pmt::from_long(1));
         nproduced++;
         d_state = STATE_PASS;
-    };
-
-    auto handle_state_pass = [&](int len){
-        if(can_move_in_to_out(len)){
-            in_to_out(len);
-            if(remaining_output() != 0)
-                return true;
-        }else
-            in_to_out_packet(remaining_move());
-        return false;
     };
 
     auto handle_state_pass_until_packet = [&](int len){
