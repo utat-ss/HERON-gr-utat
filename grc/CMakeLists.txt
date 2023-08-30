@@ -10,5 +10,6 @@ install(FILES
     UTAT_HERON_header_format_esttc.block.yml
     UTAT_HERON_esttc_framer.block.yml
     UTAT_HERON_esttc_deframer.block.yml
-    UTAT_HERON_tagged_stream_tail_tagger.block.yml DESTINATION share/gnuradio/grc/blocks
+    UTAT_HERON_tagged_stream_tail_tagger.block.yml
+    UTAT_HERON_tagged_stream_bufferer.block.yml DESTINATION share/gnuradio/grc/blocks
 )
