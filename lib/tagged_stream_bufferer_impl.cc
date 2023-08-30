@@ -48,7 +48,24 @@ tagged_stream_bufferer_impl::~tagged_stream_bufferer_impl() {}
 void tagged_stream_bufferer_impl::forecast(int noutput_items,
                                            gr_vector_int& ninput_items_required)
 {
-    ninput_items_required[0] = noutput_items;
+    int need;
+
+    switch(d_state){
+        case STATE_BLOCK:
+        case STATE_PACKET:
+            ninput_items_required[0] = noutput_items;
+            return;
+        case STATE_PADDING:
+            need = noutput_items - d_remaining_padding;
+            ninput_items_required[0] = need < 0 ? 0 : need;
+            return;
+        case STATE_BLOCK_UNTIL_PACKET:
+        case STATE_PACKET_HEADER:
+        case STATE_PACKET_UNTIL_TRAILER:
+            throw std::runtime_error("something went terribly wrong");        
+    }
+
+    
 }
 
 int tagged_stream_bufferer_impl::general_work(int noutput_items,
