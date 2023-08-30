@@ -102,14 +102,15 @@ int tagged_stream_tail_tagger_impl::general_work(
         return nproduced;
     };
 
-    
+    auto tag_offset_to_last_output_item = [&](gr::tag_t& tag){
+        tag.offset = nitems_written(0) + nproduced - 1;
+    };
 
-    auto output_packet_first_symbol = [&](const gr::tag_t& tag){
+    auto output_packet_first_symbol = [&](gr::tag_t& tag){
         d_remaining = pmt::to_long(tag.value);
-        auto new_tag = gr::tag_t(tag);
         in_to_out_packet(1);
-        new_tag.offset = nitems_written(0) + nproduced - 1;
-        add_item_tag(0, new_tag);
+        tag_offset_to_last_output_item(tag);
+        add_item_tag(0, tag);
         d_state = STATE_PACKET;
     };
 
@@ -119,6 +120,17 @@ int tagged_stream_tail_tagger_impl::general_work(
         nproduced++;
         d_state = STATE_PASS;
     };
+
+    auto handle_state_pass = [&](int len){
+        if(can_move_in_to_out(len)){
+            in_to_out(len);
+            if(remaining_output() != 0)
+                return true;
+        }else
+            in_to_out_packet(remaining_move());
+        return false;
+    };
+
 
     auto handle_state_pass_until_packet = [&](int len){
         if(can_move_in_to_out(len)){
@@ -132,7 +144,7 @@ int tagged_stream_tail_tagger_impl::general_work(
         return false;
     };
 
-    auto handle_state_packet_header = [&](const gr::tag_t& tag){
+    auto handle_state_packet_header = [&](gr::tag_t& tag){
         if(can_move_in_to_out(1)){
             output_packet_first_symbol(tag);
             d_state = STATE_PACKET;
@@ -186,11 +198,11 @@ int tagged_stream_tail_tagger_impl::general_work(
     for (size_t i = 0; i < tags.size(); i++){
 
         auto tag = tags[i];
+        int len = tag.offset - nitems_read(0) - nconsumed;
 
         if (pmt::eqv(tag.key, d_lengthtag)){
 
             d_state = STATE_PASS_UNTIL_PACKET;
-            int len = tag.offset - nitems_read(0) - nconsumed;
 
             keep_going = handle_state_pass_until_packet(len);
             if(!keep_going) return finish();
@@ -203,6 +215,16 @@ int tagged_stream_tail_tagger_impl::general_work(
 
             keep_going = handle_state_trailer();
             if(!keep_going) return finish();
+
+        }else if(d_state == STATE_PASS){
+            keep_going = handle_state_pass(len);
+            if(!keep_going) return finish();
+
+            if(can_move_in_to_out(1)){
+                in_to_out(1);
+                tag_offset_to_last_output_item(tag);
+                add_item_tag(0, tag);
+            }else return finish();
 
         }
     }
