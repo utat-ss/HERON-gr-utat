@@ -16,5 +16,6 @@ install(FILES
     esttc_framer.h
     esttc_deframer.h
     tagged_stream_tail_tagger.h
-    tagged_stream_bufferer.h DESTINATION include/gnuradio/UTAT_HERON
+    tagged_stream_bufferer.h
+    tagged_stream_fixed_length_padder.h DESTINATION include/gnuradio/UTAT_HERON
 )

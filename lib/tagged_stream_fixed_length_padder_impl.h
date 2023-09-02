@@ -1,0 +1,48 @@
+/* -*- c++ -*- */
+/*
+ * Copyright 2023 University of Toronto Aerospace Team.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+#ifndef INCLUDED_UTAT_HERON_TAGGED_STREAM_FIXED_LENGTH_PADDER_IMPL_H
+#define INCLUDED_UTAT_HERON_TAGGED_STREAM_FIXED_LENGTH_PADDER_IMPL_H
+
+#include <gnuradio/UTAT_HERON/tagged_stream_fixed_length_padder.h>
+
+namespace gr {
+namespace UTAT_HERON {
+
+class tagged_stream_fixed_length_padder_impl : public tagged_stream_fixed_length_padder
+{
+private:
+    // Nothing to declare in this block.
+    float d_sps;
+    int d_buffer_len;
+    // float d_threshold;
+    // int d_min_samps;
+    float d_samps_out;
+
+protected:
+    int calculate_output_stream_length(const gr_vector_int& ninput_items);
+
+public:
+    tagged_stream_fixed_length_padder_impl(
+        const std::string& len_tag_key,
+        float final_samples_per_symbol,
+        int final_buffer_len
+        // float threshold
+    );
+    ~tagged_stream_fixed_length_padder_impl();
+
+    // Where all the action really happens
+    int work(int noutput_items,
+             gr_vector_int& ninput_items,
+             gr_vector_const_void_star& input_items,
+             gr_vector_void_star& output_items);
+};
+
+} // namespace UTAT_HERON
+} // namespace gr
+
+#endif /* INCLUDED_UTAT_HERON_TAGGED_STREAM_FIXED_LENGTH_PADDER_IMPL_H */
