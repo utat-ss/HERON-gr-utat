@@ -17,11 +17,10 @@ class tagged_stream_fixed_length_padder_impl : public tagged_stream_fixed_length
 {
 private:
     // Nothing to declare in this block.
-    float d_sps;
+    double d_sps;
     int d_buffer_len;
-    // float d_threshold;
-    // int d_min_samps;
-    float d_samps_out;
+    uint8_t d_filler;
+    double d_samps_out;
 
 protected:
     int calculate_output_stream_length(const gr_vector_int& ninput_items);
@@ -29,9 +28,9 @@ protected:
 public:
     tagged_stream_fixed_length_padder_impl(
         const std::string& len_tag_key,
-        float final_samples_per_symbol,
-        int final_buffer_len
-        // float threshold
+        double final_samples_per_symbol,
+        int final_buffer_len,
+        uint8_t filler
     );
     ~tagged_stream_fixed_length_padder_impl();
 

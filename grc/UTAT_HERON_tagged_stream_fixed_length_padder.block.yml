@@ -4,7 +4,7 @@ category: '[UTAT]'
 
 templates:
   imports: from gnuradio import UTAT_HERON
-  make: UTAT_HERON.tagged_stream_fixed_length_padder(${len_tag_key}, ${final_samples_per_symbol}, ${final_buffer_len})
+  make: UTAT_HERON.tagged_stream_fixed_length_padder(${len_tag_key}, ${final_samples_per_symbol}, ${final_buffer_len}, ${filler})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -23,10 +23,10 @@ parameters:
 - id: final_buffer_len
   label: Final buffer Length
   dtype: int
-# - id: threshold
-#   label: Threshold
-#   dtype: float
-#   default: 1
+- id: filler
+  label: Filler
+  dtype: byte
+  default: 0x00
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:

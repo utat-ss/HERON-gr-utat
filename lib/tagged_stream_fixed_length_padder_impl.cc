@@ -16,16 +16,16 @@ using output_type = uint8_t;
 
 tagged_stream_fixed_length_padder::sptr tagged_stream_fixed_length_padder::make(
     const std::string& len_tag_key,
-    float final_samples_per_symbol,
-    int final_buffer_len
-    // float threshold
+    double final_samples_per_symbol,
+    int final_buffer_len,
+    uint8_t filler
 )
 {
     return gnuradio::make_block_sptr<tagged_stream_fixed_length_padder_impl>(
         len_tag_key,
         final_samples_per_symbol,
-        final_buffer_len
-        // threshold
+        final_buffer_len,
+        filler
     );
 }
 
@@ -35,9 +35,9 @@ tagged_stream_fixed_length_padder::sptr tagged_stream_fixed_length_padder::make(
  */
 tagged_stream_fixed_length_padder_impl::tagged_stream_fixed_length_padder_impl(
     const std::string& len_tag_key,
-    float final_samples_per_symbol,
-    int final_buffer_len
-    // float threshold
+    double final_samples_per_symbol,
+    int final_buffer_len,
+    uint8_t filler
 ) :
     gr::tagged_stream_block(
         "tagged_stream_fixed_length_padder",
@@ -46,8 +46,7 @@ tagged_stream_fixed_length_padder_impl::tagged_stream_fixed_length_padder_impl(
         len_tag_key),
     d_sps(final_samples_per_symbol),
     d_buffer_len(final_buffer_len),
-    // d_threshold(threshold),
-    // d_min_samps(std::ceil(d_buffer_len + d_threshold)),
+    d_filler(filler),
     d_samps_out(0)
 {}
 
@@ -59,7 +58,7 @@ tagged_stream_fixed_length_padder_impl::~tagged_stream_fixed_length_padder_impl(
 int tagged_stream_fixed_length_padder_impl::calculate_output_stream_length(
     const gr_vector_int& ninput_items)
 {
-    int len = (float)(d_buffer_len - d_samps_out)/d_sps + 1;
+    int len = (double)(d_buffer_len - d_samps_out)/d_sps + 1;
     if(len < ninput_items[0])
         throw std::runtime_error("Input needs to be smaller!");
     return len;
@@ -80,7 +79,7 @@ int tagged_stream_fixed_length_padder_impl::work(int noutput_items,
     produced = ninput_items[0];
 
     while(d_samps_out <= d_buffer_len && produced < noutput_items){
-        out[produced++] = 0x00;
+        out[produced++] = d_filler;
         d_samps_out += d_sps;
     }
 

@@ -36,9 +36,9 @@ public:
      */
     static sptr make(
         const std::string& len_tag_key,
-        float final_samples_per_symbol,
-        int final_buffer_len
-        // float threshold
+        double final_samples_per_symbol,
+        int final_buffer_len,
+        uint8_t filler
     );
 };
 

@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(tagged_stream_fixed_length_padder.h) */
-/* BINDTOOL_HEADER_FILE_HASH(e8323f50cc6fbf2d718fb4d63b0947d6)                     */
+/* BINDTOOL_HEADER_FILE_HASH(496d118218ce70cd353a80d130b1035b)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -43,7 +43,8 @@ void bind_tagged_stream_fixed_length_padder(py::module& m)
         .def(py::init(&tagged_stream_fixed_length_padder::make),
              py::arg("len_tag_key"),
              py::arg("final_samples_per_symbol"),
-             py::arg("final_buffer_len//floatthreshold"),
+             py::arg("final_buffer_len"),
+             py::arg("filler"),
              D(tagged_stream_fixed_length_padder, make))
 
 
