@@ -59,9 +59,8 @@ tagged_stream_fixed_length_padder_impl::~tagged_stream_fixed_length_padder_impl(
 int tagged_stream_fixed_length_padder_impl::calculate_output_stream_length(
     const gr_vector_int& ninput_items)
 {
-    // int len = static_cast<int>(std::ceil((d_min_samps - d_samps_out)/d_sps));
-    int len = d_buffer_len + 1*d_sps;
-    if(len/d_sps < ninput_items[0])
+    int len = (float)(d_buffer_len - d_samps_out)/d_sps + 1;
+    if(len < ninput_items[0])
         throw std::runtime_error("Input needs to be smaller!");
     return len;
 }
@@ -80,15 +79,15 @@ int tagged_stream_fixed_length_padder_impl::work(int noutput_items,
     d_samps_out += ninput_items[0]*d_sps;
     produced = ninput_items[0];
 
-    while(d_samps_out < d_buffer_len && produced < noutput_items){
-        out[produced++] = 0xCC;
+    while(d_samps_out <= d_buffer_len && produced < noutput_items){
+        out[produced++] = 0x00;
         d_samps_out += d_sps;
     }
 
     if(d_samps_out < d_buffer_len)
         throw std::runtime_error("Output needs to be larger!");
     
-    d_samps_out -= produced*d_sps;
+    d_samps_out -= d_buffer_len;
     return produced;
 
 }
