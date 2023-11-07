@@ -1,6 +1,6 @@
 id: UTAT_HERON_esttc_framer
 label: ESTTC Framer
-category: '[UTAT]'
+category: '[UTAT]/Framers'
 
 templates:
   imports: from gnuradio import UTAT_HERON

@@ -1,6 +1,6 @@
 id: UTAT_HERON_tagged_stream_fixed_length_padder
 label: Tagged Stream Fixed Length Padder
-category: '[UTAT]'
+category: '[UTAT]/Fixes'
 
 templates:
   imports: from gnuradio import UTAT_HERON

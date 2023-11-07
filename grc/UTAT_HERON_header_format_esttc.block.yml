@@ -1,6 +1,6 @@
 id: UTAT_HERON_header_format_esttc
 label: ESTTC Header Format
-category: '[UTAT]'
+category: '[UTAT]/Header Formats'
 flags: [ show_id, python, cpp ]
 
 parameters:

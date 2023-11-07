@@ -1,6 +1,6 @@
 id: UTAT_HERON_heron_rx_bb
 label: HERON RX BB
-category: '[UTAT]'
+category: '[UTAT]/Deprecated'
 flags: '[ deprecated ]'
 
 templates:
