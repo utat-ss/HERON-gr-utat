@@ -38,7 +38,8 @@ public:
         const std::string& len_tag_key,
         double final_samples_per_symbol,
         int final_buffer_len,
-        uint8_t filler
+        uint8_t filler,
+        int additional_symb_overflow
     );
 };
 

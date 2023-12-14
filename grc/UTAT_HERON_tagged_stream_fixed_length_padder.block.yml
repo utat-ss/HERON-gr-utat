@@ -4,7 +4,7 @@ category: '[UTAT]/Fixes'
 
 templates:
   imports: from gnuradio import UTAT_HERON
-  make: UTAT_HERON.tagged_stream_fixed_length_padder(${len_tag_key}, ${final_samples_per_symbol}, ${final_buffer_len}, ${filler})
+  make: UTAT_HERON.tagged_stream_fixed_length_padder(${len_tag_key}, ${final_samples_per_symbol}, ${final_buffer_len}, ${filler}, ${additional_symb_overflow})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -27,6 +27,10 @@ parameters:
   label: Filler
   dtype: byte
   default: 0x00
+- id: additional_symb_overflow
+  label: Additional Symbols Overflow
+  dtype: int
+  default: 1
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:

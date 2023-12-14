@@ -20,7 +20,10 @@ private:
     double d_sps;
     int d_buffer_len;
     uint8_t d_filler;
-    double d_samps_out;
+    int d_samps_overflow;
+    int d_len;
+    int d_additional_samp_overflow;
+    int d_additional_symb_overflow;
 
 protected:
     int calculate_output_stream_length(const gr_vector_int& ninput_items);
@@ -30,7 +33,8 @@ public:
         const std::string& len_tag_key,
         double final_samples_per_symbol,
         int final_buffer_len,
-        uint8_t filler
+        uint8_t filler,
+        int additional_symb_overflow
     );
     ~tagged_stream_fixed_length_padder_impl();
 
