@@ -6,10 +6,10 @@ The [ground-station](https://github.com/HeronMkII/ground-station) repository has
 
 ## Installation
 
-First clone (devel branch) and build using cmake
+First clone and build using cmake
 
 ```
-git clone https://github.com/utat-ss/HERON-gr-utat -b devel
+git clone https://github.com/utat-ss/HERON-gr-utat
 cd HERON-gr-utat
 mkdir build
 cd build

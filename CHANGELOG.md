@@ -2,14 +2,18 @@
 
 ## Highlights
 
-- Introduced `ESTTC Header Format` block
-- Introduced `ESTTC framer` block
-- Marked `HERON RX BB` as deprecated
+- Introduced new blocks:
+    - `ESTTC Header Format`
+    - `ESTTC Framer`
+    - `ESTTC Deframer`
+    - `Tagged Stream Fixed Length Padder`
+- Marked `HERON RX BB` block as deprecated
 
 ## Features
 
 - `ESTTC Header Format` is the first step in a new method of deframing ESTTC frames. The hope is to utilize GNURadio's inbuilt digital modules to do most of the dirty work. This will make the code much more readable and maintainable in addition to being smaller.
-- `ESTTC Framer` is what utilizes the `ESTTC Header Format` object to wrap messages (specifically PDU's) in an ESTTC packet.
+- `ESTTC Framer` and `ESTTC Deframer` are what utilize the `ESTTC Header Format` object to wrap/unwrap messages (specifically PDU's).
+- `Tagged Stream Fixed Length Padder` is a hack to ensure packets are properly streamed out of an SDR.
 
 # v2.0.0
 
