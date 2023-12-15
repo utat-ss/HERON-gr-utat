@@ -26,7 +26,7 @@ class qa_tagged_stream_fixed_length_padder(gr_unittest.TestCase):
         self.tb = None
 
     def test_instance(self):
-        instance = tagged_stream_fixed_length_padder('packet_len', 1, 10, 0x00)
+        instance = tagged_stream_fixed_length_padder('packet_len', 1, 10, 0x00, 5)
 
     def test_001_descriptive_test_name(self):
         # set up fg
