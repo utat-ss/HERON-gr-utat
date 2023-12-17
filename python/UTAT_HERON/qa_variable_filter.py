@@ -26,8 +26,7 @@ class qa_variable_filter(gr_unittest.TestCase):
         self.tb = None
 
     def test_instance(self):
-        # FIXME: Test will fail until you pass sensible arguments to the constructor
-        instance = variable_filter()
+        instance = variable_filter("var")
 
     def test_001_descriptive_test_name(self):
         # set up fg
