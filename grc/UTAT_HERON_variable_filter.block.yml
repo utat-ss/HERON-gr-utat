@@ -1,10 +1,10 @@
-id: UTAT_HERON_tagged_stream_fixed_length_padder
-label: Tagged Stream Fixed Length Padder
+id: UTAT_HERON_variable_filter
+label: Variable Filter
 category: '[UTAT]/Utilities'
 
 templates:
   imports: from gnuradio import UTAT_HERON
-  make: UTAT_HERON.tagged_stream_fixed_length_padder(${len_tag_key}, ${final_samples_per_symbol}, ${final_buffer_len}, ${filler}, ${additional_symb_overflow})
+  make: UTAT_HERON.variable_filter(${variable_name})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -13,24 +13,13 @@ templates:
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
 #     * default
 parameters:
-- id: len_tag_key
-  label: Length Tag Name
+- id: variable_name
+  label: Variable Name
   dtype: string
-  default: packet_len
-- id: final_samples_per_symbol
-  label: Final Samples per Symbol
-  dtype: float
-- id: final_buffer_len
-  label: Final buffer Length
-  dtype: int
-- id: filler
-  label: Filler
-  dtype: byte
-  default: 0x00
-- id: additional_symb_overflow
-  label: Additional Symbols Overflow
-  dtype: int
-  default: 1
+  default: freq
+#- id: ...
+#  label: ...
+#  dtype: ...
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
@@ -40,14 +29,16 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
-- label: in
-  domain: stream
-  dtype: byte
+- id: in
+  label: in
+  domain: message
+  dtype: message
 
 outputs:
-- label: out
-  domain: stream
-  dtype: byte
+- id: out
+  label: out
+  domain: message
+  dtype: message
 
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.

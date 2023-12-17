@@ -25,7 +25,8 @@ list(APPEND UTAT_HERON_sources
     header_format_esttc.cc
     esttc_framer_impl.cc
     esttc_deframer_impl.cc
-    tagged_stream_fixed_length_padder_impl.cc )
+    tagged_stream_fixed_length_padder_impl.cc
+    variable_filter_impl.cc )
 
 set(DEBUG_FILE "${CMAKE_BINARY_DIR}/debug_log.txt" CACHE FILEPATH
 "Log debug to this file when CMAKE_BULD_TYPE is Debug or RelWithDebInfo")

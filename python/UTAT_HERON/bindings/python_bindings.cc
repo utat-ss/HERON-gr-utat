@@ -26,6 +26,7 @@ namespace py = pybind11;
     void bind_esttc_framer(py::module& m);
     void bind_esttc_deframer(py::module& m);
     void bind_tagged_stream_fixed_length_padder(py::module& m);
+    void bind_variable_filter(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -60,5 +61,6 @@ PYBIND11_MODULE(UTAT_HERON_python, m)
     bind_esttc_framer(m);
     bind_esttc_deframer(m);
     bind_tagged_stream_fixed_length_padder(m);
+    bind_variable_filter(m);
     // ) END BINDING_FUNCTION_CALLS
 }

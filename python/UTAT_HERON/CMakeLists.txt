@@ -43,3 +43,4 @@ GR_ADD_TEST(qa_heron_rx_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_h
 GR_ADD_TEST(qa_esttc_framer ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_esttc_framer.py)
 GR_ADD_TEST(qa_esttc_deframer ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_esttc_deframer.py)
 GR_ADD_TEST(qa_tagged_stream_fixed_length_padder ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_tagged_stream_fixed_length_padder.py)
+GR_ADD_TEST(qa_variable_filter ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_variable_filter.py)
