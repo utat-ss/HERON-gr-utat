@@ -109,7 +109,7 @@ int tagged_stream_fixed_length_padder_impl::work(int noutput_items,
     std::memcpy(out, in, ninput_items[0]*sizeof(input_type));
     std::memset(fill_start, d_filler, fill_len);
 
-    d_logger->info("\n"
+    d_logger->debug("\n"
         "\tfill_len: {}\n"
         "\td_samps_overflow: {}\n",
         fill_len, d_samps_overflow);
