@@ -16,8 +16,10 @@ namespace gr {
 namespace UTAT_HERON {
 
 /*!
- * \brief <+description+>
+ * \brief Contains instructions on how to generate/indentify ESTTC packet headers
  *
+ * This block does not generate/check CRC. Its primary purpose is to provide information about
+ * packet headers for other blocks to use to actually perform framing and deframing.
  */
 class UTAT_HERON_API header_format_esttc : public gr::digital::header_format_default
 {

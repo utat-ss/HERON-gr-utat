@@ -15,7 +15,7 @@ namespace gr {
 namespace UTAT_HERON {
 
 /*!
- * \brief <+description of block+>
+ * \brief Generates valid ESTTC packets with the input as the payload
  * \ingroup UTAT_HERON
  *
  */

@@ -15,9 +15,13 @@ namespace gr {
 namespace UTAT_HERON {
 
 /*!
- * \brief <+description of block+>
+ * \brief Generate data padding to ensure correct number of samples are generated at the end
  * \ingroup UTAT_HERON
  *
+ * Adding padding to IQ data is not a good idea since IQ signals need to follow specific patterns.
+ * Padding should be added to the actual data before modulation. However, we cannot determine the
+ * exact number of samples generated, so this block generated enough padding to overflow, and then
+ * keeps track of the overflow for the next round of padding.
  */
 class UTAT_HERON_API tagged_stream_fixed_length_padder
     : virtual public gr::tagged_stream_block

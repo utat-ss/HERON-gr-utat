@@ -15,9 +15,10 @@ namespace gr {
 namespace UTAT_HERON {
 
 /*!
- * \brief <+description of block+>
+ * \brief Only allow ESTTC packet payloads to pass
  * \ingroup UTAT_HERON
  *
+ * \deprecated Replaced with UTAT_HERON::esttc_deframer
  */
 class UTAT_HERON_API heron_rx_bb : virtual public gr::block
 {
