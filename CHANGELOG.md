@@ -1,3 +1,10 @@
+# v2.1.1
+
+## Fixes
+
+- Block `Tagged Stream Fixed Length Padder`
+    - Moved logging to debug line since it was cluttering up terminal output.
+
 # v2.1.0
 
 ## Highlights
