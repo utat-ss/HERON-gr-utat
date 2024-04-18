@@ -1,4 +1,4 @@
-# gr-UTAT_HERON v2.1.0
+# gr-UTAT_HERON v2.1.1
 
 A GNURadio out-of-tree module for the HERON Mk II ground station.
 
