@@ -70,7 +70,7 @@ int tagged_stream_fixed_length_padder_impl::calculate_output_stream_length(
     
     d_len += d_additional_symb_overflow;
     
-    d_logger->info("len: {}", d_len);
+    d_logger->debug("len: {}", d_len);
 
     return d_len;
 }
