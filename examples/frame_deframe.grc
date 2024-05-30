@@ -165,13 +165,15 @@ blocks:
     coordinate: [952, 232.0]
     rotation: 0
     state: enabled
-- name: blocks_throttle_0
-  id: blocks_throttle
+- name: blocks_throttle2_0
+  id: blocks_throttle2
   parameters:
     affinity: ''
     alias: ''
     comment: ''
     ignoretag: 'True'
+    limit: auto
+    maximum: '0.1'
     maxoutbuf: '0'
     minoutbuf: '0'
     samples_per_second: samp_rate
@@ -181,7 +183,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [456, 112.0]
+    coordinate: [456, 104.0]
     rotation: 0
     state: enabled
 - name: pdu_pdu_to_tagged_stream_0
@@ -207,7 +209,7 @@ connections:
 - [UTAT_HERON_esttc_deframer_0, crc_ok, blocks_message_debug_0, log]
 - [UTAT_HERON_esttc_framer_0, pdu_out, pdu_pdu_to_tagged_stream_0, pdus]
 - [blocks_message_strobe_0, strobe, UTAT_HERON_esttc_framer_0, pdu_in]
-- [blocks_null_source_0, '0', blocks_throttle_0, '0']
+- [blocks_null_source_0, '0', blocks_throttle2_0, '0']
 - [blocks_packed_to_unpacked_xx_0, '0', blocks_tag_gate_0, '0']
 - [blocks_tag_gate_0, '0', UTAT_HERON_esttc_deframer_0, '0']
 - [pdu_pdu_to_tagged_stream_0, '0', blocks_packed_to_unpacked_xx_0, '0']
