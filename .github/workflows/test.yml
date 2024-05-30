@@ -43,5 +43,5 @@ jobs:
     - name: Test Installed Package
       working-directory: ${{github.workspace}}/examples
       run: |
-        grcc Heron_Receive.grc
-        xvfb-run --auto-servernum timeout --preserve-status 10s python3 Heron_Receive.py
+        grcc frame_deframe.grc
+        { sleep 3; echo \n; } | python frame_deframe.py
