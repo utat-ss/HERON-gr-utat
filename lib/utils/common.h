@@ -16,7 +16,7 @@ namespace crc{
 }
 
 extern const char* access_code;
-constexpr int access_code_front_trim = 8*4;
+constexpr int access_code_front_trim = 8*3;
 extern const char* trimmed_access_code;
 
 }
