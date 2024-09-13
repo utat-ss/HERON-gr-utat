@@ -6,6 +6,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+include(FetchContent)
+FetchContent_Declare(doxygen-awesome-css
+    GIT_REPOSITORY "https://github.com/jothepro/doxygen-awesome-css.git"
+    GIT_TAG "v2.3.3"
+    SOURCE_DIR "doxygen-awesome-css"
+)
+
 ########################################################################
 # Create the doxygen configuration file
 ########################################################################
@@ -40,3 +47,11 @@ add_custom_command(
 add_custom_target(doxygen_target ALL DEPENDS ${BUILT_DIRS})
 
 install(DIRECTORY ${BUILT_DIRS} DESTINATION ${GR_PKG_DOC_DIR})
+
+FetchContent_MakeAvailable(doxygen-awesome-css)
+file(READ "${CMAKE_CURRENT_BINARY_DIR}/doxygen-awesome-css/doxygen-custom/header.html" FILE_CONTENTS)
+string(REPLACE
+    "https://github.com/jothepro/doxygen-awesome-css"
+    "${PROJECT_HOMEPAGE_URL}"
+    FILE_CONTENTS "${FILE_CONTENTS}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/doxygen-awesome-css/doxygen-custom/header.html" "${FILE_CONTENTS}")

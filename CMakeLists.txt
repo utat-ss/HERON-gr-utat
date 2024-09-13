@@ -128,8 +128,8 @@ add_custom_target(uninstall
 ########################################################################
 add_subdirectory(include/gnuradio/UTAT_HERON)
 add_subdirectory(lib)
-add_subdirectory(apps)
 add_subdirectory(docs)
+add_subdirectory(apps)
 # NOTE: manually update below to use GRC to generate C++ flowgraphs w/o python
 if(ENABLE_PYTHON)
   message(STATUS "PYTHON and GRC components are enabled")
