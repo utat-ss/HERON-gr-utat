@@ -17,6 +17,7 @@ namespace UTAT_HERON {
 
 /*!
  * \brief Contains instructions on how to generate/indentify ESTTC packet headers
+ * \ingroup framing
  *
  * This block does not generate/check CRC. Its primary purpose is to provide information about
  * packet headers for other blocks to use to actually perform framing and deframing.

@@ -16,7 +16,7 @@ namespace UTAT_HERON {
 
 /*!
  * \brief Generate data padding to ensure correct number of samples are generated at the end
- * \ingroup UTAT_HERON
+ * \ingroup digital
  *
  * Adding padding to IQ data is not a good idea since IQ signals need to follow specific patterns.
  * Padding should be added to the actual data before modulation. However, we cannot determine the

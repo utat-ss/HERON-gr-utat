@@ -16,7 +16,7 @@ namespace UTAT_HERON {
 
 /*!
  * \brief Allow messages to pass through with specific keys
- * \ingroup UTAT_HERON
+ * \ingroup utils
  */
 class UTAT_HERON_API variable_filter : virtual public gr::block
 {

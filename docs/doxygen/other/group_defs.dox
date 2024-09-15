@@ -1,6 +1,11 @@
 /*!
- * \defgroup block Signal Processing Blocks
- * \brief All C++ blocks that can be used from the UTAT_HERON GNU Radio
- *        module are listed here or in the subcategories below.
- *
+ * \defgroup framing Protocol framers and deframers
+ * \brief Blocks that can wrap and unwrap datalink layer protocols.
+ * 
+ * \defgroup digital Digital manipulation
+ * \brief Blocks used to alter/maniuplate digital packets
+ * 
+ * \defgroup utils Utilities
+ * \brief Blocks used to control the flowgraph
+ * 
  */

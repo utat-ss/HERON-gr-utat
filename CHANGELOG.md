@@ -1,3 +1,17 @@
+# v3.0.0
+
+## Fixes
+
+- Block `ESTTC Deframer`
+    - Reduced number of clock bytes necessary.
+    - This was causing a lot of packet loss.
+- Deleted deprecated blocks
+    - `HERON RX BB`
+    - A lot of helper classes that weren't being used or being used by deleted blocks
+- Documentation
+    - Initiated preliminary documenation
+    - Lot of work needs to be done, but this is a start!
+
 # v2.1.1
 
 ## Fixes

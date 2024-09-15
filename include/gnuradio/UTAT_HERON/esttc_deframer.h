@@ -16,7 +16,7 @@ namespace UTAT_HERON {
 
 /*!
  * \brief Identifies ESTTC packets from bitstream, and outputs the payload as PDU
- * \ingroup UTAT_HERON
+ * \ingroup framing
  */
 class UTAT_HERON_API esttc_deframer : virtual public gr::hier_block2
 {

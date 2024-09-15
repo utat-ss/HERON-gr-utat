@@ -16,7 +16,7 @@ namespace UTAT_HERON {
 
 /*!
  * \brief Generates valid ESTTC packets with the input as the payload
- * \ingroup UTAT_HERON
+ * \ingroup framing
  *
  */
 class UTAT_HERON_API esttc_framer : virtual public gr::hier_block2
