@@ -1,10 +1,10 @@
 /*! \mainpage
 
-Welcome to the GNU Radio UTAT_HERON Block
+Welcome to the GNU Radio UTAT_HERON out-of-tree (OOT) module
 
-This is the intro page for the Doxygen manual generated for the UTAT_HERON
-block (docs/doxygen/other/main_page.dox). Edit it to add more detailed
-documentation about the new GNU Radio modules contained in this
-project.
+Blocks in this OOT are used to create flowgraphs that can talk to
+UTAT's [HERON Mk. II](https://heron.utat.space/) satellite. These blocks
+are hardware indpendent, which means that it needs to be used regardless
+of what SDR or signal chain you decide to use for your ground station.
 
 */
