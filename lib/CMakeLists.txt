@@ -11,17 +11,10 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 list(APPEND UTAT_HERON_sources
-    utils/heron_packet_manager.cc
-    utils/heron_packet_manager.h
-    utils/heron_packet.h
-    utils/debug_logger.cc
-    utils/debug_logger.h
     utils/pdu_lambda.h
     utils/pdu_lambda.cc
     utils/common.h
     utils/common.cc
-    heron_rx_bb_impl.cc
-    heron_rx_bb_impl.h
     header_format_esttc.cc
     esttc_framer_impl.cc
     esttc_deframer_impl.cc

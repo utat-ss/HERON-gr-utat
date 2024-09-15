@@ -11,7 +11,6 @@
 ########################################################################
 install(FILES
     api.h
-    heron_rx_bb.h
     header_format_esttc.h
     esttc_framer.h
     esttc_deframer.h

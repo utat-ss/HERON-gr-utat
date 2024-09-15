@@ -21,7 +21,6 @@ namespace py = pybind11;
 // Please do not delete
 /**************************************/
 // BINDING_FUNCTION_PROTOTYPES(
-    void bind_heron_rx_bb(py::module& m);
     void bind_header_format_esttc(py::module& m);
     void bind_esttc_framer(py::module& m);
     void bind_esttc_deframer(py::module& m);
@@ -56,7 +55,6 @@ PYBIND11_MODULE(UTAT_HERON_python, m)
     // Please do not delete
     /**************************************/
     // BINDING_FUNCTION_CALLS(
-    bind_heron_rx_bb(m);
     bind_header_format_esttc(m);
     bind_esttc_framer(m);
     bind_esttc_deframer(m);

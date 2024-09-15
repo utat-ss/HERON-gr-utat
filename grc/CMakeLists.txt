@@ -6,7 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 install(FILES
-    UTAT_HERON_heron_rx_bb.block.yml
     UTAT_HERON_header_format_esttc.block.yml
     UTAT_HERON_esttc_framer.block.yml
     UTAT_HERON_esttc_deframer.block.yml
