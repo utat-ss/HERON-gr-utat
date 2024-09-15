@@ -73,6 +73,12 @@ void bind_tagged_stream_fixed_length_padder(py::module& m)
         )
 
         .def(
+            "get_additional_symb_overflow",
+            &tagged_stream_fixed_length_padder::get_additional_symb_overflow,
+            D(tagged_stream_fixed_length_padder, get_additional_symb_overflow)
+        )
+
+        .def(
             "set_len_tag_key",
             &tagged_stream_fixed_length_padder::set_len_tag_key,
             py::arg("s"),

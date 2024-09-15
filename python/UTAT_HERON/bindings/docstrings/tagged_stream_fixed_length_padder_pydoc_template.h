@@ -33,6 +33,9 @@ static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_get_fin
 static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_get_filler =
     R"doc()doc";
 
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_get_additional_symb_overflow =
+    R"doc()doc";
+
 static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_set_len_tag_key =
     R"doc()doc";
 
@@ -43,4 +46,7 @@ static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_set_fin
     R"doc()doc";
 
 static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_set_filler =
+    R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_set_additional_symb_overflow =
     R"doc()doc";
