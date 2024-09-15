@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Free Software Foundation, Inc.
+ * Copyright 2024 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(tagged_stream_fixed_length_padder.h) */
-/* BINDTOOL_HEADER_FILE_HASH(6107c1c86b61dfa0ad595a4f2ffcf6cc)                     */
+/* BINDTOOL_HEADER_FILE_HASH(0d772c5e6aa39601ce45854cb2da310f)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -48,6 +48,64 @@ void bind_tagged_stream_fixed_length_padder(py::module& m)
              py::arg("additional_symb_overflow"),
              D(tagged_stream_fixed_length_padder, make))
 
+        .def(
+            "get_len_tag_key",
+            &tagged_stream_fixed_length_padder::get_len_tag_key,
+            D(tagged_stream_fixed_length_padder, get_len_tag_key)
+        )
+
+        .def(
+            "get_final_samples_per_symbol",
+            &tagged_stream_fixed_length_padder::get_final_samples_per_symbol,
+            D(tagged_stream_fixed_length_padder, get_final_samples_per_symbol)
+        )
+
+        .def(
+            "get_final_buffer_len",
+            &tagged_stream_fixed_length_padder::get_final_buffer_len,
+            D(tagged_stream_fixed_length_padder, get_final_buffer_len)
+        )
+
+        .def(
+            "get_filler",
+            &tagged_stream_fixed_length_padder::get_filler,
+            D(tagged_stream_fixed_length_padder, get_filler)
+        )
+
+        .def(
+            "set_len_tag_key",
+            &tagged_stream_fixed_length_padder::set_len_tag_key,
+            py::arg("s"),
+            D(tagged_stream_fixed_length_padder, set_len_tag_key)
+        )
+
+        .def(
+            "set_final_samples_per_symbol",
+            &tagged_stream_fixed_length_padder::set_final_samples_per_symbol,
+            py::arg("d"),
+            D(tagged_stream_fixed_length_padder, set_final_samples_per_symbol)
+        )
+
+        .def(
+            "set_final_buffer_len",
+            &tagged_stream_fixed_length_padder::set_final_buffer_len,
+            py::arg("i"),
+            D(tagged_stream_fixed_length_padder, set_final_buffer_len)
+        )
+
+        .def(
+            "set_filler",
+            &tagged_stream_fixed_length_padder::set_filler,
+            py::arg("c"),
+            D(tagged_stream_fixed_length_padder, set_filler)
+        )
+
+        .def(
+            "set_additional_symb_overflow",
+            &tagged_stream_fixed_length_padder::set_additional_symb_overflow,
+            py::arg("i"),
+            D(tagged_stream_fixed_length_padder, set_additional_symb_overflow)
+        )
 
         ;
 }

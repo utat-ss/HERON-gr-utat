@@ -22,7 +22,6 @@ private:
     uint8_t d_filler;
     int d_samps_overflow;
     int d_len;
-    int d_additional_samp_overflow;
     int d_additional_symb_overflow;
 
 protected:
@@ -43,6 +42,18 @@ public:
              gr_vector_int& ninput_items,
              gr_vector_const_void_star& input_items,
              gr_vector_void_star& output_items);
+
+    std::string get_len_tag_key() override;
+    double get_final_samples_per_symbol() override;
+    int get_final_buffer_len() override;
+    uint8_t get_filler() override;
+    int get_additional_symb_overflow() override;
+
+    void set_len_tag_key(std::string) override;
+    void set_final_samples_per_symbol(double) override;
+    void set_final_buffer_len(int) override;
+    void set_filler(uint8_t) override;
+    void set_additional_symb_overflow(int) override;
 };
 
 } // namespace UTAT_HERON

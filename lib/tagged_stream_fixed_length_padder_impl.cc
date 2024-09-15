@@ -118,5 +118,16 @@ int tagged_stream_fixed_length_padder_impl::work(int noutput_items,
 
 }
 
+std::string tagged_stream_fixed_length_padder_impl::get_len_tag_key(){ return d_length_tag_key_str; }
+double      tagged_stream_fixed_length_padder_impl::get_final_samples_per_symbol(){ return d_sps; }
+int         tagged_stream_fixed_length_padder_impl::get_final_buffer_len(){ return d_buffer_len; }
+uint8_t     tagged_stream_fixed_length_padder_impl::get_filler(){ return d_filler; }
+int         tagged_stream_fixed_length_padder_impl::get_additional_symb_overflow(){ return d_additional_symb_overflow; }
+void tagged_stream_fixed_length_padder_impl::set_len_tag_key(std::string s){ d_length_tag_key_str = std::move(s); }
+void tagged_stream_fixed_length_padder_impl::set_final_samples_per_symbol(double d){ d_sps = d; }
+void tagged_stream_fixed_length_padder_impl::set_final_buffer_len(int i){ d_buffer_len = i; }
+void tagged_stream_fixed_length_padder_impl::set_filler(uint8_t c){ d_filler = c; }
+void tagged_stream_fixed_length_padder_impl::set_additional_symb_overflow(int i){ d_additional_symb_overflow = i; }
+
 } /* namespace UTAT_HERON */
 } /* namespace gr */

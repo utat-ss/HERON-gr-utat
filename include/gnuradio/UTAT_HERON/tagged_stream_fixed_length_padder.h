@@ -45,6 +45,18 @@ public:
         uint8_t filler,
         int additional_symb_overflow
     );
+
+    virtual std::string get_len_tag_key() = 0;
+    virtual double get_final_samples_per_symbol() = 0;
+    virtual int get_final_buffer_len() = 0;
+    virtual uint8_t get_filler() = 0;
+    virtual int get_additional_symb_overflow() = 0;
+
+    virtual void set_len_tag_key(std::string s) = 0;
+    virtual void set_final_samples_per_symbol(double d) = 0;
+    virtual void set_final_buffer_len(int i) = 0;
+    virtual void set_filler(uint8_t c) = 0;
+    virtual void set_additional_symb_overflow(int i) = 0;
 };
 
 } // namespace UTAT_HERON
