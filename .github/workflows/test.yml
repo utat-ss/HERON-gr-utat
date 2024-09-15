@@ -22,7 +22,7 @@ jobs:
       - name: Download Dependencies
         run: |
           sudo apt update
-          sudo apt install cmake gnuradio xvfb libsndfile1-dev doxygem
+          sudo apt install cmake gnuradio xvfb libsndfile1-dev doxygen
       - name: Configure CMake
         run: |
           mkdir build && cd build
