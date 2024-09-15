@@ -19,8 +19,10 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        
       - name: Download Dependencies
         run: |
+          sudo add-apt-repository ppa:gnuradio/gnuradio-releases
           sudo apt update
           sudo apt install cmake gnuradio xvfb libsndfile1-dev doxygen
       - name: Configure CMake
