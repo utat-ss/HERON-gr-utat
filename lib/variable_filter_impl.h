@@ -17,6 +17,8 @@ class variable_filter_impl : public variable_filter
 {
 private:
 
+    pmt::pmt_t d_var_name;
+
 public:
     variable_filter_impl(const std::string& variable_name);
     ~variable_filter_impl();
@@ -28,6 +30,9 @@ public:
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
                      gr_vector_void_star& output_items);
+
+    std::string get_variable_name() const override;
+    void set_variable_name(const std::string& s) override;
 };
 
 } // namespace UTAT_HERON

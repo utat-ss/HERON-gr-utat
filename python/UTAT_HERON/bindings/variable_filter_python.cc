@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Free Software Foundation, Inc.
+ * Copyright 2024 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(variable_filter.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(ebc25784f8f761877810bbe2040dc8dd)                     */
+/* BINDTOOL_HEADER_FILE_HASH(dc56000375903d498ed4dc9ea9f9dc27)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -41,6 +41,20 @@ void bind_variable_filter(py::module& m)
         .def(py::init(&variable_filter::make),
              py::arg("variable_name"),
              D(variable_filter, make))
+
+        .def(
+            "get_variable_name",
+            &variable_filter::get_variable_name,
+            D(variable_filter, get_variable_name)
+        )
+
+        .def(
+            "set_variable_name",
+            &variable_filter::set_variable_name,
+            py::arg("s"),
+            D(variable_filter, set_variable_name)
+        )
+          
 
 
         ;

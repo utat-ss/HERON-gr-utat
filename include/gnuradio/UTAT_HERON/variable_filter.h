@@ -32,6 +32,9 @@ public:
      * creating new instances.
      */
     static sptr make(const std::string& variable_name);
+
+    virtual std::string get_variable_name() const = 0;
+    virtual void set_variable_name(const std::string& s) = 0;
 };
 
 } // namespace UTAT_HERON
