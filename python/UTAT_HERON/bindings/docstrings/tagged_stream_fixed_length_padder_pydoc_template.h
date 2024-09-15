@@ -20,3 +20,27 @@ static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder = R"doc
 
 static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_make =
     R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_get_len_tag_key =
+    R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_get_final_samples_per_symbol =
+    R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_get_final_buffer_len =
+    R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_get_filler =
+    R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_set_len_tag_key =
+    R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_set_final_samples_per_symbol =
+    R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_set_final_buffer_len =
+    R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_tagged_stream_fixed_length_padder_set_filler =
+    R"doc()doc";

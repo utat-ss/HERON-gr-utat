@@ -19,3 +19,7 @@ static const char* __doc_gr_UTAT_HERON_variable_filter = R"doc()doc";
 
 
 static const char* __doc_gr_UTAT_HERON_variable_filter_make = R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_variable_filter_get_variable_name = R"doc()doc";
+
+static const char* __doc_gr_UTAT_HERON_variable_filter_set_variable_name = R"doc()doc";
